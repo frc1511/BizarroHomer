@@ -9,10 +9,13 @@ public:
    *
    * @param channel The PWM channel to use.
    * @param max The max pulse width (ns).
-   * @param neutral The center (off) pulse width (ns).
+   * @param max_deadband The high end of the deadband range pulse width (ns).
+   * @param center The center (off) pulse width (ns).
+   * @param min_deadband The low end of the deadband range pulse width (ns).
    * @param min The min pulse width (ns).
+   * @param freq The PWM frequency (Hz).
    */
-  PWMMotorController(int channel, int max, int neutral, int min);
+  PWMMotorController(int channel, int max, int max_deadband, int center, int min_deadband, int min, int freq = 50);
   
   virtual ~PWMMotorController() = default;
   
@@ -41,8 +44,8 @@ public:
 private:
   int channel;
   std::string dir;
-
-  int max_width, neutral_width, min_width;
-
+  
+  int max, max_deadband, center, min_deadband, min;
+  
   bool inv = false;
 };

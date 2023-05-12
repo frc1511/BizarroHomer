@@ -1,32 +1,36 @@
 #include <BizarroHomer/Drivers/MotorControl/PWMMotorController.hpp>
 #include <fmt/core.h>
-#include <cassert>
 
-PWMMotorController::PWMMotorController(int channel, int _max, int _neutral, int _min)
-: PWM(channel), max_width(_max), neutral_width(_neutral), min_width(_min) {
-  set_period(2e7); // 20ms
+#define PERCENT_TOLERANCE 0.001
+
+PWMMotorController::PWMMotorController(int channel, int _max, int _max_deadband, int _center, int _min_deadband, int _min, int freq)
+: PWM(channel), max(_max), max_deadband(_max_deadband), center(_center), min_deadband(_min_deadband), min(_min) {
+  
+  // Set period.
+  int period = static_cast<int>((1.0 / freq) * 1000000.0);
+  set_period(period);
+  
+  // Set neutral.
   set(0.0);
-  set_enabled(true);
 
-  assert(max_width > neutral_width);
-  assert(neutral_width > min_width);
-  assert(max_width > min_width);
+  // Enable PWM.
+  set_enabled(true);
 }
 
 void PWMMotorController::set(double percent) {
   percent = std::clamp(percent, -1.0, 1.0);
-
+  
   if (inv) percent *= -1.0;
-
-  int dc = neutral_width;
-
-  if (percent >= 0) {
-    dc += static_cast<int>(percent * (max_width - neutral_width));
+  
+  int dc = center;
+  
+  if (percent >= PERCENT_TOLERANCE) {
+    dc = max_deadband + static_cast<int>(percent * (max - max_deadband));
   }
-  else {
-    dc -= static_cast<int>(percent * -1.0 * (neutral_width - min_width));
+  else if (percent <= -PERCENT_TOLERANCE) {
+    dc = min_deadband - static_cast<int>(percent * -1.0 * (min_deadband - min));
   }
-
+  
   set_duty_cycle(dc);
 }
 
