@@ -24,3 +24,7 @@ add_subdirectory("${BH_THIRDPARTY_DIR}/fmt")
 
 target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt)
 
+add_subdirectory("${BH_THIRDPARTY_DIR}/Phoenix")
+
+target_link_libraries(${PROJECT_NAME} PUBLIC Phoenix)
+
