@@ -1,4 +1,4 @@
-#include <BizarroHomer/Drivers/PWM.hpp>
+#include <BizarroHomer/Hardware/PWM.hpp>
 #include <fmt/core.h>
 #include <string>
 #include <sys/ioctl.h>
