@@ -7,7 +7,7 @@ PWMMotorController::PWMMotorController(int channel, int _max, int _max_deadband,
 : PWM(channel), max(_max), max_deadband(_max_deadband), center(_center), min_deadband(_min_deadband), min(_min) {
   
   // Set period.
-  int period = static_cast<int>((1.0 / freq) * 1000000.0);
+  int period = 1e9 / freq;
   set_period(period);
   
   // Set neutral.
