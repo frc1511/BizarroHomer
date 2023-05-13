@@ -2,7 +2,7 @@
 
 #include <BizarroHomer/Hardware/PWM.hpp>
 
-class PWMMotorController : public PWM {
+class PWMMotorController {
 public:
   /**
    * @brief Creates a PWMMotorController class instance.
@@ -42,8 +42,7 @@ public:
   constexpr bool get_inverted() const { return inv; }
   
 private:
-  int channel;
-  std::string dir;
+  PWM pwm;
   
   int max, max_deadband, center, min_deadband, min;
   
