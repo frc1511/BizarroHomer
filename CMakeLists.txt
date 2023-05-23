@@ -26,6 +26,10 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads)
 
+find_package(SDL2 REQUIRED)
+target_include_directories(${PROJECT_NAME} PUBLIC ${SDL2_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${SDL2_LIBRARIES})
+
 set(BH_THIRDPARTY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty")
 
 add_subdirectory("${BH_THIRDPARTY_DIR}/fmt")
