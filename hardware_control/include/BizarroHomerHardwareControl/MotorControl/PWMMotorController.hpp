@@ -1,9 +1,8 @@
 #pragma once
 
-#include <BizarroHomer/Hardware/PWM.hpp>
-#include <BizarroHomer/Hardware/MotorControl/MotorController.hpp>
+#include <BizarroHomerHardwareControl/PWM.hpp>
 
-class PWMMotorController : public MotorController {
+class PWMMotorController {
 public:
   /**
    * @brief Creates a PWMMotorController class instance.
@@ -26,7 +25,7 @@ public:
    *
    * @param percent The percent output (-1 to 1).
    */
-  void set(double percent) override;
+  void set(double percent);
   
 private:
   PWM pwm;

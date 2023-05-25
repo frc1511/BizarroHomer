@@ -1,10 +1,10 @@
-#include <BizarroHomer/Hardware/MotorControl/PWMMotorController.hpp>
+#include <BizarroHomerHardwareControl/MotorControl/PWMMotorController.hpp>
 #include <fmt/core.h>
 
 #define PERCENT_TOLERANCE 0.001
 
 PWMMotorController::PWMMotorController(int channel, int _max, int _max_deadband, int _center, int _min_deadband, int _min, int freq)
-: MotorController(fmt::format("pwm{}", channel)), pwm(channel), max(_max), max_deadband(_max_deadband), center(_center), min_deadband(_min_deadband), min(_min) {
+: pwm(channel), max(_max), max_deadband(_max_deadband), center(_center), min_deadband(_min_deadband), min(_min) {
   
   // Set period.
   int period = 1e9 / freq;
@@ -20,8 +20,6 @@ PWMMotorController::PWMMotorController(int channel, int _max, int _max_deadband,
 void PWMMotorController::set(double percent) {
   percent = std::clamp(percent, -1.0, 1.0);
   
-  if (inverted) percent *= -1.0;
-  
   int dc = center;
   
   if (percent >= PERCENT_TOLERANCE) {
@@ -30,8 +28,6 @@ void PWMMotorController::set(double percent) {
   else if (percent <= -PERCENT_TOLERANCE) {
     dc = min_deadband - static_cast<int>(percent * -1.0 * (min_deadband - min));
   }
-  
-  if (!enabled) dc = center;
   
   pwm.set_duty_cycle(dc);
 }
