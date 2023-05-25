@@ -12,7 +12,7 @@ endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-file(GLOB_RECURSE BH_SOURCES "src/*.cpp")
+file(GLOB_RECURSE BH_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 add_executable(${PROJECT_NAME} ${BH_SOURCES})
 
@@ -34,9 +34,5 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${SDL2_LIBRARIES})
 # fmt
 target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt)
 
-set(BH_THIRDPARTY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../thirdparty")
-set(BH_THIRDPARTY_DEST_DIR "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_thirdparty")
-
 # Phoenix
-add_subdirectory("${BH_THIRDPARTY_DIR}/Phoenix" "${BH_THIRDPARTY_DEST_DIR}/Phoenix")
 target_link_libraries(${PROJECT_NAME} PUBLIC Phoenix)
