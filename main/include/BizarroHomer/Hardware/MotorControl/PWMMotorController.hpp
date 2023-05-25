@@ -1,8 +1,9 @@
 #pragma once
 
 #include <BizarroHomer/Hardware/PWM.hpp>
+#include <BizarroHomer/Hardware/MotorControl/MotorController.hpp>
 
-class PWMMotorController {
+class PWMMotorController : public MotorController {
 public:
   /**
    * @brief Creates a PWMMotorController class instance.
@@ -25,26 +26,10 @@ public:
    *
    * @param percent The percent output (-1 to 1).
    */
-  void set(double percent);
-  
-  /**
-   * @brief Sets whether the motor controller should be controlled inversely.
-   *
-   * @param inverted Whether the motor is inverted.
-   */
-  constexpr void set_inverted(bool inverted) { inv = inverted; }
-  
-  /**
-   * @brief Returns whether the motor controller is being controlled inversely.
-   *
-   * @return Whether the motor is inverted.
-   */
-  constexpr bool get_inverted() const { return inv; }
+  void set(double percent) override;
   
 private:
   PWM pwm;
   
   int max, max_deadband, center, min_deadband, min;
-  
-  bool inv = false;
 };

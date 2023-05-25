@@ -3,6 +3,7 @@
 #include <string>
 #include <filesystem>
 
+// Represents a PWM device.
 class PWM {
 public:
   /**
@@ -11,8 +12,6 @@ public:
    * @param channel The PWM channel to use.
    */
   PWM(int channel);
-  
-  virtual ~PWM() = default;
   
   /**
    * @brief Sets the duty cycle of the PWM channel.

@@ -1,4 +1,5 @@
 #include <BizarroHomer/Control/GameController/GameControllerManager.hpp>
+#include <BizarroHomer/Control/GameController/DualShock4.hpp>
 #include <SDL2/SDL.h>
 #include <cstring>
 #include <cassert>
@@ -27,6 +28,11 @@ void GameControllerManager::get_input(int id, InputFrame* frame) {
   
   frame->buttons = all_buttons[id];
   std::memcpy(&frame->axes, &all_axes[id * 6], 6 * sizeof(double));
+}
+
+bool GameControllerManager::get_controller_connected(int id) {
+  std::lock_guard<std::mutex> lk(thrd_mut);
+  return conn_controllers & (1 << id);
 }
 
 void GameControllerManager::terminate() {
@@ -58,10 +64,13 @@ void GameControllerManager::thrd_main() {
             fmt::print("SDL_JoystickOpen({}) failed.\n", i);
             continue;
           }
+          DualShock4_LEDManager::get()->update_controllers();
           // Set the bit.
           reg |= (1 << i);
           // Add to map.
           reg_joysticks[i] = j;
+          std::lock_guard<std::mutex> lk(thrd_mut);
+          conn_controllers = reg;
         }
       }
     }
@@ -72,13 +81,18 @@ void GameControllerManager::thrd_main() {
       if (ev.type == SDL_QUIT) break;
       // Handle disconnection.
       if (ev.jdevice.type == SDL_JOYDEVICEREMOVED) {
+        fmt::print("Controller disconnected\n");
         uint16_t which = ev.jdevice.which;
         // Close joystick.
         SDL_JoystickClose(reg_joysticks[which]);
         reg_joysticks.erase(which);
         
+        // Un-set the bit.
+        reg &= ~(1 << which);
+        
         // Zero inputs for controller.
         std::lock_guard<std::mutex> lk(thrd_mut);
+        conn_controllers = reg;
         all_buttons[which] = 0;
         std::memset(&all_axes[which * 6], 0, 6 * sizeof(double));
       }

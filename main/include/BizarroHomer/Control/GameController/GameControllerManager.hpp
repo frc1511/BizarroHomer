@@ -22,6 +22,8 @@ public:
   
   void get_input(int id, InputFrame* frame);
 
+  bool get_controller_connected(int id);
+
   void terminate();
   
 private:
@@ -38,6 +40,7 @@ private:
   };
   
   uint16_t reg_controllers = 0;
+  uint16_t conn_controllers = 0;
   
   uint16_t all_buttons[MAX_CONTROLLERS];
   double all_axes[6 * MAX_CONTROLLERS];

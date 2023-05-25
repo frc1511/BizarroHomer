@@ -1,0 +1,12 @@
+[Unit]
+Description=Bizarro Homer Robot Control Service
+[Service]
+Type=simple
+User=pi
+Group=admin
+ExecStart=/usr/local/bin/BizarroHomer
+Restart=on-failure
+RestartSec=10
+KillMode=process
+[Install]
+WantedBy=multi-user.target
