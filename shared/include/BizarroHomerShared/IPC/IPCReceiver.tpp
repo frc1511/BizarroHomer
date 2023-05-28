@@ -1,4 +1,4 @@
 template<typename T>
-void IPCReceiver::recv_msg(T& msg) {
-  recv_msg(*msg, sizeof(T));
+bool IPCReceiver::recv_msg(T* msg) {
+  return recv_msg(msg, sizeof(T) - sizeof(long));
 }

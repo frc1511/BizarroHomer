@@ -24,12 +24,13 @@ IPCReceiver::IPCReceiver(const char* pathname, int proj_id) {
 
 IPCReceiver::~IPCReceiver() { }
 
-void IPCReceiver::recv_msg(void* msg, size_t msg_size) {
-  if (!ipc_open) return;
+bool IPCReceiver::recv_msg(void* msg, size_t msg_size) {
+  if (!ipc_open) return false;
   
-  std::memset(msg, 0, msg_size);
   if (msgrcv(msqid, msg, msg_size, 1, 0) < 0) {
     fmt::print("msgrcv() failed:\n\t{}\n", strerror(errno));
-    return;
+    return false;
   }
+  
+  return true;
 }

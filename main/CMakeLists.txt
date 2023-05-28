@@ -18,6 +18,8 @@ add_executable(${PROJECT_NAME} ${BH_SOURCES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
+target_link_libraries(${PROJECT_NAME} PUBLIC BizarroHomerShared)
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 if(NOT Threads_FOUND)

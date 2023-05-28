@@ -8,10 +8,10 @@ public:
   ~IPCSender();
   
   template<typename T>
-  void send_msg(T& msg);
+  bool send_msg(T& msg);
   
 private:
-  void send_msg(void* msg, size_t msg_size);
+  bool send_msg(void* msg, size_t msg_size);
   
   int msqid = -1;
   bool ipc_open = false;

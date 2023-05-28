@@ -23,11 +23,13 @@ IPCSender::IPCSender(const char* pathname, int proj_id) {
 
 IPCSender::~IPCSender() { }
 
-void IPCSender::send_msg(void* msg, size_t msg_size) {
-  if (!ipc_open) return;
+bool IPCSender::send_msg(void* msg, size_t msg_size) {
+  if (!ipc_open) return false;
   
   if (msgsnd(msqid, msg, msg_size, 0) < 0) {
     fmt::print("msgsnd() failed:\n\t{}\n", strerror(errno));
-    return;
+    return false;
   }
+  
+  return true;
 }

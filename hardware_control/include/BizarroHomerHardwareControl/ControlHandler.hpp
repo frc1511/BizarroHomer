@@ -2,13 +2,14 @@
 
 #include <BizarroHomerHardwareControl/Hardware/MotorControl/PWMSparkMax.hpp>
 #include <BizarroHomerHardwareControl/Hardware/Solenoid.hpp>
+#include <BizarroHomerShared/IPC/IPCReceiver.hpp>
 #define Phoenix_No_WPI
 #include <ctre/Phoenix.h>
 #include <mutex>
 
-class IPCControlHandler {
+class ControlHandler {
 public:
-  IPCControlHandler(std::mutex* hardware_mut, PWMSparkMax* drive_left, PWMSparkMax* drive_right, TalonFX* pivot_left, TalonFX* pivot_right, TalonFX* shooter_rot, Solenoid* fill_valve, Solenoid* shoot_valve);
+  ControlHandler(std::mutex* hardware_mut, PWMSparkMax* drive_left, PWMSparkMax* drive_right, TalonFX* pivot_left, TalonFX* pivot_right, TalonFX* shooter_rot, Solenoid* fill_valve, Solenoid* shoot_valve);
   
   /**
    * @brief Stops all hardware from moving.
@@ -25,9 +26,6 @@ public:
 private:
   bool is_shutdown = false;
   
-  bool is_open = false;
-  int msqid = -1;
-  
   std::mutex* hardware_mut;
   PWMSparkMax* drive_left;
   PWMSparkMax* drive_right;
@@ -36,4 +34,6 @@ private:
   TalonFX* shooter_rot;
   Solenoid* fill_valve;
   Solenoid* shoot_valve;
+  
+  IPCReceiver r;
 };

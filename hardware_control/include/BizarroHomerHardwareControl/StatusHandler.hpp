@@ -6,10 +6,10 @@
 #include <mutex>
 #include <thread>
 
-class IPCStatusHandler {
+class StatusHandler {
 public:
-  IPCStatusHandler(std::mutex* hardware_mut, TalonFX* pivot_left, TalonFX* pivot_right, TalonFX* shooter_rot, DutyCycleEncoder* shooter_rot_enc);
-  ~IPCStatusHandler();
+  StatusHandler(std::mutex* hardware_mut, TalonFX* pivot_left, TalonFX* pivot_right, TalonFX* shooter_rot, DutyCycleEncoder* shooter_rot_enc);
+  ~StatusHandler();
   
   void terminate();
   

@@ -1,14 +1,9 @@
-#include <BizarroHomerHardwareControl/IPCControlHandler.hpp>
+#include <BizarroHomerHardwareControl/ControlHandler.hpp>
 #include <fmt/core.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/msg.h>
 #include <cstring>
 #include <cerrno>
 
 #define IPC_PATHNAME "/var/frc1511/BizarroHomer/ipc_msg_queue_key"
-
-#define IPC_CONTROL_MSG_SIZE 35
 
 struct IPCControlMessage {
   long mtype;
@@ -28,27 +23,12 @@ struct IPCControlMessage {
   } data;
 };
 
-IPCControlHandler::IPCControlHandler(std::mutex* _hardware_mut, PWMSparkMax* _drive_left, PWMSparkMax* _drive_right, TalonFX* _pivot_left, TalonFX* _pivot_right, TalonFX* _shooter_rot, Solenoid* _fill_valve, Solenoid* _shoot_valve)
-: hardware_mut(_hardware_mut), drive_left(_drive_left), drive_right(_drive_right), pivot_left(_pivot_left), pivot_right(_pivot_right), shooter_rot(_shooter_rot), fill_valve(_fill_valve), shoot_valve(_shoot_valve) {
+ControlHandler::ControlHandler(std::mutex* _hardware_mut, PWMSparkMax* _drive_left, PWMSparkMax* _drive_right, TalonFX* _pivot_left, TalonFX* _pivot_right, TalonFX* _shooter_rot, Solenoid* _fill_valve, Solenoid* _shoot_valve)
+: hardware_mut(_hardware_mut), drive_left(_drive_left), drive_right(_drive_right), pivot_left(_pivot_left), pivot_right(_pivot_right), shooter_rot(_shooter_rot), fill_valve(_fill_valve), shoot_valve(_shoot_valve), r(IPC_PATHNAME, 'C') {
   stop();
-  
-  key_t key = ftok(IPC_PATHNAME, 'C');
-  if (key < 0) {
-    fmt::print("ftok() failed:\n\t{}\n", strerror(errno));
-    return;
-  }
-  
-  // Create or open the message queue.
-  msqid = msgget(key, IPC_CREAT | 0666);
-  if (msqid < 0) {
-    fmt::print("msgget() failed:\n\t{}\n", strerror(errno));
-    return;
-  }
-  
-  is_open = true;
 }
 
-void IPCControlHandler::stop() {
+void ControlHandler::stop() {
   std::lock_guard<std::mutex> lk(*hardware_mut);
   // Stop motors from moving.
   drive_left->set(0.0);
@@ -61,23 +41,18 @@ void IPCControlHandler::stop() {
   shoot_valve->set(true);
 }
 
-void IPCControlHandler::shutdown() {
+void ControlHandler::shutdown() {
   is_shutdown = true;
 }
 
-void IPCControlHandler::handle_control_msg() {
+void ControlHandler::handle_control_msg() {
   if (is_shutdown) return;
-  
-  if (!is_open) {
-    stop();
-    return;
-  }
   
   IPCControlMessage msg;
   std::memset(&msg, 0, sizeof(IPCControlMessage));
   
-  if (msgrcv(msqid, &msg, IPC_CONTROL_MSG_SIZE, 1, 0) < 0) {
-    fmt::print("msgrcv() failed:\n\t{}\n", strerror(errno));
+  if (!r.recv_msg(&msg)) {
+    stop();
     return;
   }
   

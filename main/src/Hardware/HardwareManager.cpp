@@ -1,15 +1,12 @@
 #include <BizarroHomer/Hardware/HardwareManager.hpp>
+#include <BizarroHomerShared/IPC/IPCSender.hpp>
+#include <BizarroHomerShared/IPC/IPCReceiver.hpp>
 #include <fmt/core.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/msg.h>
 #include <cstring>
 #include <cerrno>
 #include <chrono>
 
 #define IPC_PATHNAME "/var/frc1511/BizarroHomer/ipc_msg_queue_key"
-
-#define IPC_CONTROL_MSG_SIZE 27
 
 struct IPCControlMessage {
   long mtype;
@@ -99,24 +96,14 @@ double HardwareManager::get_shooter_rotation_absolute_encoder() {
 }
 
 void HardwareManager::control_thread_main() {
+  return;
   std::memset(&control_data, 0, sizeof(ControlData));
   control_data.fill_valve = true;
   control_data.shoot_valve = true;
   control_data.drive_left = 0x80;
   control_data.drive_right = 0x80;
   
-  key_t key = ftok(IPC_PATHNAME, 'C');
-  if (key < 0) {
-    fmt::print("ftok() failed:\n\t{}\n", strerror(errno));
-    return;
-  }
-  
-  // Create or open the message queue.
-  int msqid = msgget(key, IPC_CREAT | 0666);
-  if (msqid < 0) {
-    fmt::print("msgget() failed:\n\t{}\n", strerror(errno));
-    return;
-  }
+  IPCSender s(IPC_PATHNAME, 'C');
   
   while (true) {
     IPCControlMessage msg;
@@ -126,10 +113,7 @@ void HardwareManager::control_thread_main() {
       msg.data = control_data;
     }
     
-    if (msgsnd(msqid, &msg, IPC_CONTROL_MSG_SIZE, 0) < 0) {
-      fmt::print("msgsnd() failed:\n\t{}\n", strerror(errno));
-      return;
-    }
+    if (!s.send_msg(msg)) return;
     
     using namespace std::literals::chrono_literals;
     std::this_thread::sleep_for(20ms);
@@ -137,29 +121,16 @@ void HardwareManager::control_thread_main() {
 }
 
 void HardwareManager::status_thread_main() {
+  return;
   std::memset(&status_data, 0, sizeof(StatusData));
   
-  key_t key = ftok(IPC_PATHNAME, 'S');
-  if (key < 0) {
-    fmt::print("ftok() failed:\n\t{}\n", strerror(errno));
-    return;
-  }
-  
-  // Create or open the message queue.
-  int msqid = msgget(key, IPC_CREAT | 0666);
-  if (msqid < 0) {
-    fmt::print("msgget() failed:\n\t{}\n", strerror(errno));
-    return;
-  }
+  IPCReceiver r(IPC_PATHNAME, 'S');
   
   while (true) {
     IPCStatusMessage msg;
     std::memset(&msg, 0, sizeof(IPCControlMessage));
     
-    if (msgrcv(msqid, &msg, IPC_STATUS_MSG_SIZE, 1, 0) < 0) {
-      fmt::print("msgrcv() failed:\n\t{}\n", strerror(errno));
-      return;
-    }
+    if (!r.recv_msg(&msg)) return;
     
     {
       std::lock_guard<std::mutex> lk(status_mutex);

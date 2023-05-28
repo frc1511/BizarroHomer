@@ -1,8 +1,8 @@
 #include <BizarroHomerHardwareControl/Hardware/MotorControl/PWMSparkMax.hpp>
 #include <BizarroHomerHardwareControl/Hardware/Encoder/DutyCycleEncoder.hpp>
 #include <BizarroHomerHardwareControl/Hardware/Solenoid.hpp>
-#include <BizarroHomerHardwareControl/IPCStatusHandler.hpp>
-#include <BizarroHomerHardwareControl/IPCControlHandler.hpp>
+#include <BizarroHomerHardwareControl/StatusHandler.hpp>
+#include <BizarroHomerHardwareControl/ControlHandler.hpp>
 #include <BizarroHomerHardwareControl/IOMap.hpp>
 #define Phoenix_No_WPI
 #include <ctre/Phoenix.h>
@@ -35,14 +35,14 @@ int main() {
   Solenoid fill_valve(IOMap::DO_FILL_VALVE);
   Solenoid shoot_valve(IOMap::DO_SHOOT_VALVE);
   
-  IPCStatusHandler status_handler {
+  StatusHandler status_handler {
     &hardware_mut,
     /* &pivot_left, &pivot_right, */
     /* &shooter_rot, */
     nullptr, nullptr, nullptr,
     &shooter_rot_enc
   };
-  IPCControlHandler control_handler {
+  ControlHandler control_handler {
     &hardware_mut,
     &drive_left, &drive_right,
     /* &pivot_left, &pivot_right, */

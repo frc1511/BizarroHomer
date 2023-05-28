@@ -1,5 +1,6 @@
 #pragma once
 
+#include <BizarroHomerShared/IPC/IPCSender.hpp>
 #include <BizarroHomer/Util/Color.hpp>
 #include <cstdint>
 #include <thread>
@@ -53,13 +54,12 @@ private:
   DualShock4_LEDManager();
   ~DualShock4_LEDManager();
   
-  bool is_open = false;
-  int msqid = -1;
-  
   Color col_1 { 0, 0, 0 },
         col_2 { 0, 0, 0 };
 
   void send_msg(bool update_ctrl);
+  
+  IPCSender s;
   
   static DualShock4_LEDManager instance;
 };

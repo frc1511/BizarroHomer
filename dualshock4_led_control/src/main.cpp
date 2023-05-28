@@ -1,8 +1,7 @@
 #include <BizarroHomerDualShock4LEDControl/LEDHandler.hpp>
+#include <BizarroHomerShared/IPC/IPCReceiver.hpp>
 #include <fmt/core.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/msg.h>
+#include <fmt/format.h>
 #include <csignal>
 #include <cstring>
 
@@ -28,36 +27,23 @@ int main() {
   signal(SIGTRAP, sig_handler);
   signal(SIGABRT, sig_handler);
   
-  key_t key = ftok(IPC_PATHNAME, 'D');
-  if (key < 0) {
-    fmt::print("ftok() failed:\n\t{}\n", strerror(errno));
-    return 1;
-  }
-  
-  // Create or open the message queue.
-  int msqid = msgget(key, IPC_CREAT | 0666);
-  if (msqid < 0) {
-    fmt::print("msgget() failed:\n\t{}\n", strerror(errno));
-    return 1;
-  }
+  IPCReceiver r(IPC_PATHNAME, 'D');
   
   IPCMessage msg;
   std::memset(&msg, 0, sizeof(IPCMessage));
   
   {
     LEDHandler led_handler;
-  
+    
     while (!sig) {
-      if (msgrcv(msqid, &msg, IPC_MSG_SIZE, 1, 0) < 0) {
-        fmt::print("msgrcv() failed:\n\t{}\n", strerror(errno));
-        return 1;
-      }
+      if (!r.recv_msg(&msg)) break;
+      
       if (msg.mtext[6]) {
         led_handler.set_should_update_controllers();
       }
       led_handler.set_colors(
-          Color { msg.mtext[0], msg.mtext[1], msg.mtext[2] },
-          Color { msg.mtext[3], msg.mtext[4], msg.mtext[5] }
+        Color { msg.mtext[0], msg.mtext[1], msg.mtext[2] },
+        Color { msg.mtext[3], msg.mtext[4], msg.mtext[5] }
       );
     }
   }
