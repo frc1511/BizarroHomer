@@ -1,5 +1,6 @@
 #pragma once
 
+#include <BizarroHomerShared/Config/Config.hpp>
 #include <cstddef>
 
 class IPCReceiver {

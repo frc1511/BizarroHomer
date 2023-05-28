@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.1)
 
 project(BizarroHomerShared)
 
+set(IPC_PATHNAME OFF CACHE BOOL "/var/frc1511/BizarroHomer/ipc_msg_queue_key" FORCE)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -20,3 +22,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/i
 
 # fmt
 target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt)
+
+# Config file
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/include/BizarroHomerShared/Config/Config.hpp.in"
+  "${CMAKE_CURRENT_SOURCE_DIR}/include/BizarroHomerShared/Config/Config.hpp"
+)

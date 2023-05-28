@@ -5,8 +5,6 @@
 #include <csignal>
 #include <cstring>
 
-#define IPC_PATHNAME "/var/frc1511/BizarroHomer/ipc_msg_queue_key"
-
 #define IPC_MSG_SIZE 7
 
 struct IPCMessage {

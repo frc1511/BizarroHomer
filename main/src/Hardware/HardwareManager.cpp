@@ -6,8 +6,6 @@
 #include <cerrno>
 #include <chrono>
 
-#define IPC_PATHNAME "/var/frc1511/BizarroHomer/ipc_msg_queue_key"
-
 struct IPCControlMessage {
   long mtype;
   HardwareManager::ControlData data;
