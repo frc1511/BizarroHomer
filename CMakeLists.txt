@@ -14,6 +14,7 @@ add_subdirectory("${BH_THIRDPARTY_DIR}/Phoenix")
 
 # --- Build programs ---
 
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/shared")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/main")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dualshock4_led_control")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/hardware_control")
