@@ -1,6 +1,6 @@
 #pragma once
 
-#include <BizarroHomerHardwareControl/Encoder/DutyCycleEncoder.hpp>
+#include <BizarroHomerHardwareControl/Hardware/Encoder/DutyCycleEncoder.hpp>
 #define Phoenix_No_WPI
 #include <ctre/Phoenix.h>
 #include <mutex>

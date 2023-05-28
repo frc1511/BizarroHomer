@@ -8,11 +8,12 @@
 
 #define IPC_PATHNAME "/var/frc1511/BizarroHomer/ipc_msg_queue_key"
 
-#define IPC_CONTROL_MSG_SIZE 27
+#define IPC_CONTROL_MSG_SIZE 35
 
 struct IPCControlMessage {
   long mtype;
   struct Data {
+    uint64_t timestamp;
     unsigned enabled : 1;
     unsigned fill_valve : 1;
     unsigned shoot_valve : 1;
@@ -27,7 +28,7 @@ struct IPCControlMessage {
   } data;
 };
 
-IPCControlHandler::IPCControlHandler(std::mutex* _hardware_mut, PWMSparkMax* _drive_left, PWMSparkMax* _drive_right, TalonFX* _pivot_left, TalonFX* _pivot_right, TalonFX* _shooter_rot, SingleSolenoid* _fill_valve, SingleSolenoid* _shoot_valve)
+IPCControlHandler::IPCControlHandler(std::mutex* _hardware_mut, PWMSparkMax* _drive_left, PWMSparkMax* _drive_right, TalonFX* _pivot_left, TalonFX* _pivot_right, TalonFX* _shooter_rot, Solenoid* _fill_valve, Solenoid* _shoot_valve)
 : hardware_mut(_hardware_mut), drive_left(_drive_left), drive_right(_drive_right), pivot_left(_pivot_left), pivot_right(_pivot_right), shooter_rot(_shooter_rot), fill_valve(_fill_valve), shoot_valve(_shoot_valve) {
   stop();
   
@@ -52,9 +53,9 @@ void IPCControlHandler::stop() {
   // Stop motors from moving.
   drive_left->set(0.0);
   drive_right->set(0.0);
-  pivot_left->Set(TalonFXControlMode::PercentOutput, 0.0);
-  pivot_right->Set(TalonFXControlMode::PercentOutput, 0.0);
-  shooter_rot->Set(TalonFXControlMode::PercentOutput, 0.0);
+  /* pivot_left->Set(TalonFXControlMode::PercentOutput, 0.0); */
+  /* pivot_right->Set(TalonFXControlMode::PercentOutput, 0.0); */
+  /* shooter_rot->Set(TalonFXControlMode::PercentOutput, 0.0); */
   // Close everything in Pneumatics system.
   fill_valve->set(true);
   shoot_valve->set(true);
@@ -80,6 +81,8 @@ void IPCControlHandler::handle_control_msg() {
     return;
   }
   
+  fmt::print("Received control message\n");
+  
   // Enabled.
   if (!msg.data.enabled) {
     stop();
@@ -97,7 +100,7 @@ void IPCControlHandler::handle_control_msg() {
   drive_left->set(to_pct(msg.data.drive_left));
   drive_right->set(to_pct(msg.data.drive_right));
   
-  pivot_left->Set(TalonFXControlMode::Position, msg.data.pivot_left);
-  pivot_right->Set(TalonFXControlMode::Position, msg.data.pivot_right);
-  shooter_rot->Set(TalonFXControlMode::Position, msg.data.shooter_rot);
+  /* pivot_left->Set(TalonFXControlMode::Position, msg.data.pivot_left); */
+  /* pivot_right->Set(TalonFXControlMode::Position, msg.data.pivot_right); */
+  /* shooter_rot->Set(TalonFXControlMode::Position, msg.data.shooter_rot); */
 }

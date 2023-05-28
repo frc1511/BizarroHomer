@@ -1,6 +1,6 @@
 #pragma once
 
-#include <BizarroHomerHardwareControl/MotorControl/PWMMotorController.hpp>
+#include <BizarroHomerHardwareControl/Hardware/MotorControl/PWMMotorController.hpp>
 
 class PWMSparkMax final : public PWMMotorController {
 public:

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <BizarroHomerHardwareControl/PWM.hpp>
+#include <BizarroHomerHardwareControl/Hardware/PWM.hpp>
 
 class PWMMotorController {
 public:

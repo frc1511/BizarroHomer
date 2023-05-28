@@ -1,9 +1,9 @@
 #pragma once
 
-class SingleSolenoid {
+class Solenoid {
 public:
-  SingleSolenoid(int channel);
-  ~SingleSolenoid();
+  Solenoid(int channel);
+  ~Solenoid();
 
   void set(bool direction);
 

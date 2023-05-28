@@ -15,7 +15,8 @@ struct IPCStatusMessage {
   long mtype;
   struct Data {
     unsigned enabled : 1;
-    unsigned pad : 7;
+    unsigned pressure_switch : 1;
+    unsigned pad : 6;
     double pivot_left_enc;
     double pivot_right_enc;
     double shooter_rot_enc;
@@ -26,12 +27,10 @@ struct IPCStatusMessage {
 IPCStatusHandler::IPCStatusHandler(std::mutex* _hardware_mut, TalonFX* _pivot_left, TalonFX* _pivot_right, TalonFX* _shooter_rot, DutyCycleEncoder* _shooter_rot_enc)
 : hardware_mut(_hardware_mut), pivot_left(_pivot_left), pivot_right(_pivot_right), shooter_rot(_shooter_rot), shooter_rot_enc(_shooter_rot_enc),
   status_thread([&]() { this->status_thread_main(); }) {
-
 }
 
 IPCStatusHandler::~IPCStatusHandler() {
   terminate();
-  status_thread.join();
 }
 
 void IPCStatusHandler::terminate() {
@@ -64,17 +63,19 @@ void IPCStatusHandler::status_thread_main() {
       std::lock_guard<std::mutex> lk(*hardware_mut);
       status.mtype = 1;
       status.data.enabled = 1;
-      status.data.pivot_left_enc = pivot_left->GetSelectedSensorPosition(0);
-      status.data.pivot_right_enc = pivot_right->GetSelectedSensorPosition(0);
-      status.data.shooter_rot_enc = shooter_rot->GetSelectedSensorPosition(0);
+      /* status.data.pivot_left_enc = pivot_left->GetSelectedSensorPosition(0); */
+      /* status.data.pivot_right_enc = pivot_right->GetSelectedSensorPosition(0); */
+      /* status.data.shooter_rot_enc = shooter_rot->GetSelectedSensorPosition(0); */
       status.data.shooter_rot_abs_enc = shooter_rot_enc->get();
     }
     
     // Send the status message.
-    if (msgrcv(msqid, &status, IPC_STATUS_MSG_SIZE, 1, 0) < 0) {
-      fmt::print("msgrcv() failed:\n\t{}\n", strerror(errno));
+    if (msgsnd(msqid, &status, IPC_STATUS_MSG_SIZE, 0) < 0) {
+      fmt::print("msgsnd() failed:\n\t{}\n", strerror(errno));
       return;
     }
+    
+    fmt::print("Sent status message\n");
     
     // Send status messages every 15ms, because why not?
     using namespace std::literals::chrono_literals;

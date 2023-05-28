@@ -1,4 +1,4 @@
-#include <BizarroHomerHardwareControl/Encoder/DutyCycleEncoder.hpp>
+#include <BizarroHomerHardwareControl/Hardware/Encoder/DutyCycleEncoder.hpp>
 
 DutyCycleEncoder::DutyCycleEncoder(int _channel)
 : channel(_channel) {

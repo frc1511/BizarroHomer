@@ -1,4 +1,4 @@
-#include <BizarroHomerHardwareControl/MotorControl/PWMSparkMax.hpp>
+#include <BizarroHomerHardwareControl/Hardware/MotorControl/PWMSparkMax.hpp>
 
 #define SPARKMAX_MAX          (2000 * 1000)
 #define SPARKMAX_MAX_DEADBAND (1525 * 1000)

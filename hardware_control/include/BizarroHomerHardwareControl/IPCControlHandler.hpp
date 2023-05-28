@@ -1,14 +1,14 @@
 #pragma once
 
-#include <BizarroHomerHardwareControl/MotorControl/PWMSparkMax.hpp>
-#include <BizarroHomerHardwareControl/SingleSolenoid.hpp>
+#include <BizarroHomerHardwareControl/Hardware/MotorControl/PWMSparkMax.hpp>
+#include <BizarroHomerHardwareControl/Hardware/Solenoid.hpp>
 #define Phoenix_No_WPI
 #include <ctre/Phoenix.h>
 #include <mutex>
 
 class IPCControlHandler {
 public:
-  IPCControlHandler(std::mutex* hardware_mut, PWMSparkMax* drive_left, PWMSparkMax* drive_right, TalonFX* pivot_left, TalonFX* pivot_right, TalonFX* shooter_rot, SingleSolenoid* fill_valve, SingleSolenoid* shoot_valve);
+  IPCControlHandler(std::mutex* hardware_mut, PWMSparkMax* drive_left, PWMSparkMax* drive_right, TalonFX* pivot_left, TalonFX* pivot_right, TalonFX* shooter_rot, Solenoid* fill_valve, Solenoid* shoot_valve);
   
   /**
    * @brief Stops all hardware from moving.
@@ -34,6 +34,6 @@ private:
   TalonFX* pivot_left;
   TalonFX* pivot_right;
   TalonFX* shooter_rot;
-  SingleSolenoid* fill_valve;
-  SingleSolenoid* shoot_valve;
+  Solenoid* fill_valve;
+  Solenoid* shoot_valve;
 };

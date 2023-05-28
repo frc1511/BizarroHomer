@@ -1,4 +1,4 @@
-#include <BizarroHomer/Hardware/CAN.hpp>
+#include <BizarroHomerHardwareControl//Hardware/CAN.hpp>
 #include <fmt/core.h>
 
 CAN::CAN(int id, int manufacturer, int type, std::string interface) {

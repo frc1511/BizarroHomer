@@ -1,4 +1,4 @@
-#include <BizarroHomerHardwareControl/MotorControl/PWMMotorController.hpp>
+#include <BizarroHomerHardwareControl/Hardware/MotorControl/PWMMotorController.hpp>
 #include <fmt/core.h>
 
 #define PERCENT_TOLERANCE 0.001
