@@ -97,3 +97,5 @@ void HardwareManager::status_thread_main() {
     }
   }
 }
+
+HardwareManager HardwareManager::instance;

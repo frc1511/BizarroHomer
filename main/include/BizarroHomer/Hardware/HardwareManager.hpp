@@ -36,7 +36,7 @@ public:
   enum class ControlProperty : uint8_t {
     INIT     = 0,
     DIGITAL  = 1,
-    PCERCENT = 2,
+    PERCENT = 2,
     POSITION = 3,
   };
   
