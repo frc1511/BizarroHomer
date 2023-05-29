@@ -68,6 +68,13 @@ void HardwareManager::send_status_msgs() {
     msg.data.value = t->GetSelectedSensorPosition(0);
     s.send_msg(msg);
   }
+  // Encoders.
+  msg.data.hardware_type = HTYPE_ENC;
+  for (const auto& [id, e] : encoders) {
+    msg.data.hardware_id = id;
+    msg.data.value = e->get();
+    s.send_msg(msg);
+  }
   // Digital Inputs.
   msg.data.hardware_type = HTYPE_DIG_IN;
   msg.data.hardware_prop = SPROP_DIG;
@@ -149,6 +156,9 @@ void HardwareManager::recv_thread_main() {
         case HTYPE_PWM_SPARK_MAX:
           spark_maxes[id] = std::make_unique<PWMSparkMax>(id);
           break;
+        case HTYPE_ENC:
+          encoders[id] = std::make_unique<DutyCycleEncoder>(id);
+          break;
       }
       continue;
     }
@@ -166,8 +176,9 @@ void HardwareManager::recv_thread_main() {
     std::lock_guard<std::mutex> lk(hardware_mut);
     switch (t) {
       case HTYPE_DIG_IN:
+      case HTYPE_ENC:
+        // Sensors that cannot be controlled.
         warn_invalid_prop();
-        // TODO: Make work.
         break;
       case HTYPE_DIG_OUT:
         if (p != CPROP_DIG) {
