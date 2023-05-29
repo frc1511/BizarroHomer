@@ -20,6 +20,7 @@ int main() {
   
   while (!sig) {
     HardwareManager::get()->send_status_msgs();
+    HardwareManager::get()->process_hardware();
     
     using namespace std::literals::chrono_literals;
     std::this_thread::sleep_for(20ms);

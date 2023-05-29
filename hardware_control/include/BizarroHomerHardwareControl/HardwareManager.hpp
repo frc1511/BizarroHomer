@@ -23,6 +23,7 @@ public:
   HardwareManager& operator=(HardwareManager const&) = delete;
   
   void send_status_msgs();
+  void process_hardware();
   
   void terminate();
   

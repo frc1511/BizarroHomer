@@ -1,5 +1,6 @@
 #include <BizarroHomerHardwareControl/HardwareManager.hpp>
 #include <BizarroHomerShared/IPC/IPCReceiver.hpp>
+#include <ctre/phoenix/unmanaged/Unmanaged.h>
 #include <fmt/core.h>
 
 enum ControlMessageType {
@@ -85,6 +86,14 @@ void HardwareManager::send_status_msgs() {
   }
 }
 
+void HardwareManager::process_hardware() {
+  std::lock_guard<std::mutex> lk(hardware_mut);
+  if (enabled) {
+    // Feed CTRE enabled status.
+    ctre::phoenix::unmanaged::Unmanaged::FeedEnable(100);
+  }
+}
+
 void HardwareManager::terminate() {
   std::lock_guard<std::mutex> lk(manager_mut);
   should_term = true;
@@ -100,7 +109,8 @@ void HardwareManager::stop() {
   }
   for (const auto& [id, p] : digital_outputs) {
     const auto& [o, s] = p;
-    if (s == 1 || s == 2) {
+    // Set to default position, if has default position.
+    if (s) {
       o->set(static_cast<bool>(s - 1));
     }
   }
@@ -108,6 +118,14 @@ void HardwareManager::stop() {
 
 void HardwareManager::recv_thread_main() {
   IPCReceiver r(IPC_PATHNAME, 'C');
+  
+  {
+    std::lock_guard<std::mutex> lk(hardware_mut);
+    // Start Phoenix background tasks.
+    ctre::phoenix::unmanaged::Unmanaged::LoadPhoenix();
+    // Start Phoenix diagnostic server immediately.
+    ctre::phoenix::unmanaged::Unmanaged::SetPhoenixDiagnosticsStartTime(0);
+  }
   
   while (true) {
     {
@@ -148,13 +166,27 @@ void HardwareManager::recv_thread_main() {
           digital_inputs[id] = std::make_unique<DigitalInput>(id);
           break;
         case HTYPE_DIG_OUT:
-          digital_outputs[id] = std::make_pair(std::make_unique<DigitalOutput>(id), static_cast<int>(v));
+          {
+            auto& [o, s] = (digital_outputs[id] = std::make_pair(std::make_unique<DigitalOutput>(id), static_cast<int>(v)));
+            // Set to default position, if has default position.
+            if (s) {
+              o->set(static_cast<bool>(s - 1));
+            }
+          }
           break;
         case HTYPE_CAN_TALON_FX:
-          talon_fxs[id] = std::make_unique<TalonFX>(id);
+          {
+            auto& t = (talon_fxs[id] = std::make_unique<TalonFX>(id));
+            // Set to stopped.
+            t->Set(TalonFXControlMode::PercentOutput, 0.0);
+          }
           break;
         case HTYPE_PWM_SPARK_MAX:
-          spark_maxes[id] = std::make_unique<PWMSparkMax>(id);
+          {
+            auto& s = (spark_maxes[id] = std::make_unique<PWMSparkMax>(id));
+            // Set to stopped.
+            s->set(0.0);
+          }
           break;
         case HTYPE_ENC:
           encoders[id] = std::make_unique<DutyCycleEncoder>(id);
