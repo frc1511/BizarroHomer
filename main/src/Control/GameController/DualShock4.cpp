@@ -12,24 +12,28 @@ struct IPCMessage {
 
 DualShock4_LEDManager::DualShock4_LEDManager()
 : s(IPC_PATHNAME, 'D') {
+  std::lock_guard<std::mutex> lk(led_mutex);
   send_msg(true);
 }
 
 DualShock4_LEDManager::~DualShock4_LEDManager() { }
 
 void DualShock4_LEDManager::set_color(Color col) {
+  std::lock_guard<std::mutex> lk(led_mutex);
   col_1 = col;
   col_2 = col;
   send_msg(false);
 }
 
 void DualShock4_LEDManager::set_alternating_colors(Color _col_1, Color _col_2) {
+  std::lock_guard<std::mutex> lk(led_mutex);
   col_1 = _col_1;
   col_2 = _col_2;
   send_msg(false);
 }
 
 void DualShock4_LEDManager::update_controllers() {
+  std::lock_guard<std::mutex> lk(led_mutex);
   send_msg(true);
 }
 

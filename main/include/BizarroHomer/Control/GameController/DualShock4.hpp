@@ -3,7 +3,6 @@
 #include <BizarroHomerShared/IPC/IPCSender.hpp>
 #include <BizarroHomer/Util/Color.hpp>
 #include <cstdint>
-#include <thread>
 #include <mutex>
 
 class DualShock4_Button {
@@ -60,6 +59,7 @@ private:
   void send_msg(bool update_ctrl);
   
   IPCSender s;
+  std::mutex led_mutex;
   
   static DualShock4_LEDManager instance;
 };
