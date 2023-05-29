@@ -1,4 +1,4 @@
-#include <BizarroHomer/Hardware/TalonFX.hpp>
+#include <BizarroHomer/Hardware/MotorControl/TalonFX.hpp>
 #include <BizarroHomer/Hardware/HardwareManager.hpp>
 
 #define HARDWARE_TYPE HardwareManager::HardwareType::CAN_TALON_FX

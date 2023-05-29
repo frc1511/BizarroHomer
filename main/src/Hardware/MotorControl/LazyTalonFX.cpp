@@ -1,4 +1,4 @@
-#include <BizarroHomer/Hardware/LazyTalonFX.hpp>
+#include <BizarroHomer/Hardware/MotorControl/LazyTalonFX.hpp>
 
 LazyTalonFX::LazyTalonFX(int can_id)
 : TalonFX(can_id) { }

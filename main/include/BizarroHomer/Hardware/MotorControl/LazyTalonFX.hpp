@@ -1,6 +1,6 @@
 #pragma once
 
-#include <BizarroHomer/Hardware/TalonFX.hpp>
+#include <BizarroHomer/Hardware/MotorControl/TalonFX.hpp>
 
 class LazyTalonFX : public TalonFX {
 public:
