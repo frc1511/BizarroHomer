@@ -3,12 +3,11 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
-#include <cstring>
 
 IPCReceiver::IPCReceiver(const char* pathname, int proj_id) {
   key_t key = ftok(pathname, proj_id);
   if (key < 0) {
-    fmt::print("ftok() failed:\n\t{}\n", strerror(errno));
+    fmt::print("ftok({}, {}) failed:\n\t{}\n", pathname, proj_id, strerror(errno));
     return;
   }
   

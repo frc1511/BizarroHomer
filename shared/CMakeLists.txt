@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.1)
 
 project(BizarroHomerShared)
 
-set(IPC_PATHNAME OFF CACHE BOOL "/var/frc1511/BizarroHomer/ipc_msg_queue_key" FORCE)
+set(IPC_PATHNAME "/var/frc1511/BizarroHomer/ipc_msg_queue_key" CACHE BOOL "IPC Message Queue Key Path" FORCE)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

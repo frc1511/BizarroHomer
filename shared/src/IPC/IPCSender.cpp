@@ -7,7 +7,7 @@
 IPCSender::IPCSender(const char* pathname, int proj_id) {
   key_t key = ftok(pathname, proj_id);
   if (key < 0) {
-    fmt::print("ftok() failed:\n\t{}\n", strerror(errno));
+    fmt::print("ftok({}, {}) failed:\n\t{}\n", pathname, proj_id, strerror(errno));
     return;
   }
   
