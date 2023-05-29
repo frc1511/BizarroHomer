@@ -150,6 +150,7 @@ void HardwareManager::recv_thread_main() {
         encoders.clear();
         digital_inputs.clear();
         digital_outputs.clear();
+        fmt::print("Reset message received.\n");
       }
       else {
         if (msg.data.control_type == MSG_DISABLE) {
@@ -157,6 +158,7 @@ void HardwareManager::recv_thread_main() {
         }
         std::lock_guard<std::mutex> lk(hardware_mut);
         enabled = (msg.data.control_type == MSG_ENABLE);
+        fmt::print("{} message received.\n", enabled ? "Enable" : "Disable");
       }
       continue;
     }
