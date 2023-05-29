@@ -190,13 +190,14 @@ void HardwareManager::recv_thread_main() {
         }
         break;
       case HTYPE_CAN_TALON_FX:
-        if (p != CPROP_PCT && p != CPROP_POS) {
-          warn_invalid_prop();
-          break;
-        }
-        if (check_init(talon_fxs)) {
+        if (!check_init(talon_fxs)) break;
+        if (p == CPROP_PCT) {
           talon_fxs.at(id)->Set(TalonFXControlMode::PercentOutput, v);
         }
+        else if (p == CPROP_POS) {
+          talon_fxs.at(id)->Set(TalonFXControlMode::Position, v);
+        }
+        else warn_invalid_prop();
         break;
       case HTYPE_PWM_SPARK_MAX:
         if (p != CPROP_PCT) {
