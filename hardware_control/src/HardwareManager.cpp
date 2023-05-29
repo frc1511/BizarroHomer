@@ -19,8 +19,9 @@ enum HardwareType {
 };
 
 struct IPCControlMessage {
-  long mtype;
+  long mtype = 1;
   struct Data {
+    uint8_t control_type;
     uint8_t hardware_type;
     uint8_t hardware_id;
     uint8_t hardware_prop;
@@ -36,7 +37,7 @@ enum ControlProperty {
 };
 
 struct IPCStatusMessage {
-  long mtype;
+  long mtype = 1;
   struct Data {
     uint8_t hardware_type;
     uint8_t hardware_id;
@@ -92,6 +93,9 @@ void HardwareManager::process_hardware() {
     // Feed CTRE enabled status.
     ctre::phoenix::unmanaged::Unmanaged::FeedEnable(100);
   }
+  else {
+    // TODO: Disable GPIO pin outputs?
+  }
 }
 
 void HardwareManager::terminate() {
@@ -137,8 +141,8 @@ void HardwareManager::recv_thread_main() {
     if (!r.recv_msg(&msg)) break;
     
     // Message type.
-    if (msg.mtype != MSG_CONTROL) {
-      if (msg.mtype == MSG_RESET) {
+    if (msg.data.control_type != MSG_CONTROL) {
+      if (msg.data.control_type == MSG_RESET) {
         stop();
         std::lock_guard<std::mutex> lk(hardware_mut);
         spark_maxes.clear();
@@ -148,17 +152,17 @@ void HardwareManager::recv_thread_main() {
         digital_outputs.clear();
       }
       else {
-        if (msg.mtype == MSG_DISABLE) {
+        if (msg.data.control_type == MSG_DISABLE) {
           stop();
         }
         std::lock_guard<std::mutex> lk(hardware_mut);
-        enabled = (msg.mtype == MSG_ENABLE);
+        enabled = (msg.data.control_type == MSG_ENABLE);
       }
-      return;
+      continue;
     }
     
     // Init hardware.
-    const auto& [t, id, p, v] = msg.data;
+    const auto& [c, t, id, p, v] = msg.data;
     if (p == CPROP_INIT) {
       std::lock_guard<std::mutex> lk(hardware_mut);
       switch (t) {
@@ -203,6 +207,11 @@ void HardwareManager::recv_thread_main() {
       fmt::print("Control error: Hardware id of {} of type {} was never initialized.", id, t);
       return false;
     };
+    
+    if (!enabled) {
+      stop();
+      continue;
+    }
     
     // Control hardware.
     std::lock_guard<std::mutex> lk(hardware_mut);

@@ -1,11 +1,18 @@
 #include <BizarroHomer/Basic/SignalHandler.hpp>
 #include <BizarroHomer/Control/GameController/GameControllerManager.hpp>
 #include <BizarroHomer/Control/GameController/DualShock4.hpp>
+#include <BizarroHomer/Hardware/MotorControl/PWMSparkMax.hpp>
+#include <BizarroHomer/Hardware/HardwareManager.hpp>
 #include <fmt/core.h>
 #include <thread>
 #include <chrono>
 
 int main() {
+  HardwareManager::get()->reset_hardware();
+  PWMSparkMax drive_left(0);
+  PWMSparkMax drive_right(0);
+  HardwareManager::get()->set_enabled(true);
+  
   // Register the controllers that we are gonna use.
   GameControllerManager::get()->register_controller(0);
   GameControllerManager::InputFrame frame;
@@ -22,7 +29,7 @@ int main() {
     GameControllerManager::get()->get_input(0, &frame);
     
     double left = frame.axes[DualShock4_Axis::LEFT_Y];
-    double right = frame.axes[DualShock4_Axis::RIGHT_Y];
+    double right = -frame.axes[DualShock4_Axis::RIGHT_Y];
     
     if (std::abs(left) < 0.1) {
       left = 0.0;
@@ -31,7 +38,10 @@ int main() {
       right = 0.0;
     }
     
-    fmt::print("{} --- {}\n", left, -right);
+    fmt::print("{} --- {}\n", left, right);
+    
+    drive_left.set_percent(left);
+    drive_right.set_percent(right);
     
     using namespace std::literals::chrono_literals;
     std::this_thread::sleep_for(20ms);

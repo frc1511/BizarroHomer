@@ -1,4 +1,5 @@
 #include <BizarroHomer/Basic/SignalHandler.hpp>
+#include <BizarroHomer/Hardware/HardwareManager.hpp>
 #include <BizarroHomer/Control/GameController/DualShock4.hpp>
 #include <signal.h>
 #include <fmt/core.h>
@@ -29,8 +30,10 @@ void SignalHandler::sig_handler(int sig) {
   
   fmt::print("Signal {} caught\n", sig);
   
-  // TODO: Stop all motors.
+  HardwareManager::get()->set_enabled(false);
+  
   DualShock4_LEDManager::get()->set_alternating_colors(Color(0, 0, 255), Color(0, 0, 0));
+  
 }
 
 SignalHandler SignalHandler::instance;
