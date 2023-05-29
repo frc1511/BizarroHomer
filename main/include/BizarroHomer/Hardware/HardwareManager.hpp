@@ -1,7 +1,11 @@
 #pragma once
 
+#include <BizarroHomerShared/IPC/IPCSender.hpp>
 #include <mutex>
 #include <thread>
+#include <functional>
+#include <vector>
+#include <utility>
 
 class HardwareManager {
 public:
@@ -11,7 +15,7 @@ public:
   
   HardwareManager(HardwareManager const&) = delete;
   HardwareManager& operator=(HardwareManager const&) = delete;
-
+  
   /**
    * @brief Sets whether hardware components should be enabled.
    *
@@ -19,136 +23,53 @@ public:
    */
   void set_enabled(bool enabled);
   
-  /**
-   * @brief Sets the position of the fill valve.
-   *
-   * @param closed Whether the valve should be closed.
-   */
-  void set_fill_valve(bool closed);
+  void reset_hardware();
   
-  /**
-   * @brief Sets the position of the shoot valve.
-   *
-   * @param closed Whether the valve should be closed.
-   */
-  void set_shoot_valve(bool closed);
-  
-  /**
-   * @brief Sets the percent output of the left drive motor.
-   *
-   * @param percent The percent output of the motor (-1 to 1).
-   */
-  void set_drive_left(double percent);
-  
-  /**
-   * @brief Sets the percent output of the right drive motor.
-   *
-   * @param percent The percent output of the motor (-1 to 1).
-   */
-  void set_drive_right(double percent);
-  
-  /**
-   * @brief Sets the PID reference position of the left pivot motor.
-   *
-   * @param position Desired position (rotations) of the left pivot motor.
-   */
-  void set_pivot_left(double position);
-  
-  /**
-   * @brief Sets the PID reference position of the right pivot motor.
-   *
-   * @param position Desired position (rotations) of the right pivot motor.
-   */
-  void set_pivot_right(double position);
-  
-  /**
-   * @brief Sets the PID reference position of the shooter rotation motor.
-   *
-   * @param position Desired position (rotations) of the shooter rotation motor.
-   */
-  void set_shooter_rotation(double position);
-  
-  /**
-   * @brief Returns whether the hardware components are enabled.
-   *
-   * @return Whether the hardware components are enabled.
-   */
-  bool get_enabled();
-  
-  /**
-   * @brief Returns the status of the 120 PSI pressure switch.
-   *
-   * @return The status of the pressure switch.
-   */
-  bool get_pressure_switch();
-  
-  /**
-   * @brief Returns the encoder position of the left pivot motor.
-   *
-   * @return The encoder position (rotations) of the left pivot motor.
-   */
-  double get_pivot_left_encoder();
-  
-  /**
-   * @brief Returns the encoder position of the right pivot motor.
-   *
-   * @return The encoder position (rotations) of the right pivot motor.
-   */
-  double get_pivot_right_encoder();
-  
-  /**
-   * @brief Returns the encoder position of the shooter rotation motor.
-   *
-   * @return The encoder position (rotations) of the shooter rotation motor.
-   */
-  double get_shooter_rotation_encoder();
-  
-  /**
-   * @brief Returns the absolute encoder position of the shooter rotation.
-   *
-   * @return The absolute rotation of the shooter rotation.
-   */
-  double get_shooter_rotation_absolute_encoder();
-  
-  struct ControlData {
-    unsigned enabled : 1;
-    unsigned fill_valve : 1;
-    unsigned shoot_valve : 1;
-    unsigned pad : 5;
-    // Motor percent outputs (0x00 - 0xFF).
-    uint8_t drive_left;
-    uint8_t drive_right;
-    // Motor PID positions.
-    double pivot_left;
-    double pivot_right;
-    double shooter_rot;
+  enum class HardwareType : uint8_t {
+    DIGITAL_IN    = 0,
+    DIGITAL_OUT   = 1,
+    CAN_TALON_FX  = 2,
+    PWM_SPARK_MAX = 3,
+    ENCODER       = 4,
   };
   
-  struct StatusData {
-    unsigned enabled : 1;
-    unsigned pressure_switch : 1;
-    unsigned pad : 6;
-    double pivot_left_enc;
-    double pivot_right_enc;
-    double shooter_rot_enc;
-    double shooter_rot_abs_enc;
+  enum class ControlProperty : uint8_t {
+    INIT     = 0,
+    DIGITAL  = 1,
+    PCERCENT = 2,
+    POSITION = 3,
   };
+  
+  void send_ctrl_msg(HardwareType type, uint8_t id, ControlProperty prop, double value);
+  
+  enum class StatusProperty : uint8_t {
+    ENCODER,
+    DIGITAL,
+  };
+  
+  using StatusCallbackFunc = std::function<void(double value)>;
+  
+  void register_status_callback(HardwareType type, uint8_t id, StatusProperty prop, StatusCallbackFunc callback);
   
 private:
   HardwareManager();
   ~HardwareManager();
   
-  std::thread control_thread,
-              status_thread;
+  std::thread status_thread;
   std::mutex control_mutex,
              status_mutex;
   
-  void control_thread_main();
+  struct StatusCallbackID {
+    HardwareType type;
+    uint8_t id;
+    StatusProperty prop;
+  };
+  
+  std::vector<std::pair<StatusCallbackID, StatusCallbackFunc>> status_callbacks;
+  
   void status_thread_main();
   
-  ControlData control_data;
-  
-  StatusData status_data;
+  IPCSender s;
   
   static HardwareManager instance;
 };

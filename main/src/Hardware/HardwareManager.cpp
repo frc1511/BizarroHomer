@@ -1,140 +1,99 @@
 #include <BizarroHomer/Hardware/HardwareManager.hpp>
-#include <BizarroHomerShared/IPC/IPCSender.hpp>
 #include <BizarroHomerShared/IPC/IPCReceiver.hpp>
 #include <fmt/core.h>
 #include <cstring>
 #include <cerrno>
 #include <chrono>
 
-struct IPCControlMessage {
-  long mtype;
-  HardwareManager::ControlData data;
+enum ControlMessageType {
+  MSG_CONTROL = 1,
+  MSG_ENABLE = 2,
+  MSG_DISABLE = 3,
+  MSG_RESET = 4,
 };
 
-#define IPC_STATUS_MSG_SIZE 33
+struct IPCControlMessage {
+  long mtype;
+  struct Data {
+    uint8_t hardware_type;
+    uint8_t hardware_id;
+    uint8_t hardware_prop;
+    double value;
+  } data;
+};
 
 struct IPCStatusMessage {
   long mtype;
-  HardwareManager::StatusData data;
+  struct Data {
+    uint8_t hardware_type;
+    uint8_t hardware_id;
+    uint8_t hardware_prop;
+    double value;
+  } data;
 };
 
 HardwareManager::HardwareManager()
-: control_thread([&]() { this->control_thread_main(); }), status_thread([&]() { this->status_thread_main(); }) { }
+: s(IPC_PATHNAME, 'C') { }
 
 HardwareManager::~HardwareManager() { }
 
 void HardwareManager::set_enabled(bool enabled) {
-  std::lock_guard<std::mutex> lk(control_mutex);
-  control_data.enabled = enabled;
-}
-
-void HardwareManager::set_fill_valve(bool closed) {
-  std::lock_guard<std::mutex> lk(control_mutex);
-  control_data.fill_valve = closed;
-}
-
-void HardwareManager::set_shoot_valve(bool closed) {
-  std::lock_guard<std::mutex> lk(control_mutex);
-  control_data.shoot_valve = closed;
-}
-
-void HardwareManager::set_drive_left(double percent) {
-  std::lock_guard<std::mutex> lk(control_mutex);
-  control_data.drive_left = percent;
-}
-
-void HardwareManager::set_drive_right(double percent) {
-  std::lock_guard<std::mutex> lk(control_mutex);
-  control_data.drive_right = percent;
-}
-
-void HardwareManager::set_pivot_left(double position) {
-  std::lock_guard<std::mutex> lk(control_mutex);
-  control_data.pivot_left = position;
-}
-
-void HardwareManager::set_pivot_right(double position) {
-  std::lock_guard<std::mutex> lk(control_mutex);
-  control_data.pivot_right = position;
-}
-
-void HardwareManager::set_shooter_rotation(double position) {
-  std::lock_guard<std::mutex> lk(control_mutex);
-  control_data.shooter_rot = position;
-}
-
-bool HardwareManager::get_enabled() {
-  std::lock_guard<std::mutex> lk(status_mutex);
-  return status_data.enabled;
-}
-
-bool HardwareManager::get_pressure_switch() {
-  std::lock_guard<std::mutex> lk(status_mutex);
-  return status_data.pressure_switch;
-}
-
-double HardwareManager::get_pivot_left_encoder() {
-  std::lock_guard<std::mutex> lk(status_mutex);
-  return status_data.pivot_left_enc;
-}
-
-double HardwareManager::get_pivot_right_encoder() {
-  std::lock_guard<std::mutex> lk(status_mutex);
-  return status_data.pivot_right_enc;
-}
-
-double HardwareManager::get_shooter_rotation_encoder() {
-  std::lock_guard<std::mutex> lk(status_mutex);
-  return status_data.shooter_rot_enc;
-}
-
-double HardwareManager::get_shooter_rotation_absolute_encoder() {
-  std::lock_guard<std::mutex> lk(status_mutex);
-  return status_data.shooter_rot_abs_enc;
-}
-
-void HardwareManager::control_thread_main() {
-  return;
-  std::memset(&control_data, 0, sizeof(ControlData));
-  control_data.fill_valve = true;
-  control_data.shoot_valve = true;
-  control_data.drive_left = 0x80;
-  control_data.drive_right = 0x80;
+  IPCControlMessage msg;
+  std::memset(&msg, 0, sizeof(IPCControlMessage));
+  // Set the message type.
+  msg.mtype = enabled ? MSG_ENABLE : MSG_DISABLE;
   
-  IPCSender s(IPC_PATHNAME, 'C');
+  // Send the message.
+  std::lock_guard<std::mutex> lk(control_mutex);
+  s.send_msg(msg);
+}
+
+void HardwareManager::reset_hardware() {
+  IPCControlMessage msg;
+  std::memset(&msg, 0, sizeof(IPCControlMessage));
+  // Set the message type to reset.
+  msg.mtype = MSG_RESET;
   
-  while (true) {
-    IPCControlMessage msg;
-    msg.mtype = 1;
-    {
-      std::lock_guard<std::mutex> lk(control_mutex);
-      msg.data = control_data;
-    }
-    
-    if (!s.send_msg(msg)) return;
-    
-    using namespace std::literals::chrono_literals;
-    std::this_thread::sleep_for(20ms);
-  }
+  // Send the message.
+  std::lock_guard<std::mutex> lk(control_mutex);
+  s.send_msg(msg);
+}
+
+void HardwareManager::send_ctrl_msg(HardwareType type, uint8_t id, ControlProperty prop, double value) {
+  IPCControlMessage msg;
+  msg.mtype = MSG_CONTROL;
+  msg.data.hardware_type = static_cast<uint8_t>(type);
+  msg.data.hardware_id = id;
+  msg.data.hardware_prop = static_cast<uint8_t>(prop);
+  msg.data.value = value;
+  
+  // Send the message.
+  std::lock_guard<std::mutex> lk(control_mutex);
+  s.send_msg(msg);
+}
+
+void HardwareManager::register_status_callback(HardwareType type, uint8_t id, StatusProperty prop, StatusCallbackFunc callback) {
+  std::lock_guard<std::mutex> lk(status_mutex);
+  status_callbacks.emplace_back(StatusCallbackID { type, id, prop }, callback);
 }
 
 void HardwareManager::status_thread_main() {
-  return;
-  std::memset(&status_data, 0, sizeof(StatusData));
-  
   IPCReceiver r(IPC_PATHNAME, 'S');
   
   while (true) {
     IPCStatusMessage msg;
-    std::memset(&msg, 0, sizeof(IPCControlMessage));
+    if (!r.recv_msg(&msg)) break;
     
-    if (!r.recv_msg(&msg)) return;
+    // Find callback.
+    std::lock_guard<std::mutex> lk(status_mutex);
+    decltype(status_callbacks)::const_iterator it = std::find_if(status_callbacks.cbegin(), status_callbacks.cend(), [&msg](auto p) {
+      return msg.data.hardware_type == static_cast<uint8_t>(p.first.type) &&
+             msg.data.hardware_id   == p.first.id &&
+             msg.data.hardware_prop == static_cast<uint8_t>(p.first.prop);
+    });
     
-    {
-      std::lock_guard<std::mutex> lk(status_mutex);
-      status_data = msg.data;
+    if (it != status_callbacks.cend()) {
+      it->second(msg.data.value);
     }
   }
 }
-
-HardwareManager HardwareManager::instance;
