@@ -20,15 +20,21 @@ Controls::~Controls() {
 
 void Controls::process() {
   GameControllerManager::InputFrame frame;
-  bool conn = GameControllerManager::get()->get_controller_connected(GC_DRIVER);
-  if (!conn) {
-    // Controller not connected...
-    // TODO: Do something crazy.
+  if (!GameControllerManager::get()->get_controller_connected(GC_DRIVER)) {
+    // Controller not connected... FREAK OUT!!!!
     
     drive->tank_control(0.0, 0.0);
     
     fmt::print("Controller {} not connected\n", GC_DRIVER);
+    was_conn = false;
+    
     return;
+  }
+  
+  if (!was_conn) {
+    fmt::print("green!!\n");
+    DualShock4_LEDManager::get()->set_color(Color(0, 255, 0));
+    was_conn = true;
   }
   
   // Get input from controller.

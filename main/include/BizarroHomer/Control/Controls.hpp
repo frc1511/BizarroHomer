@@ -14,6 +14,7 @@ public:
 private:
   Drive* drive;
   
+  bool was_conn = false;
   bool was_drive_toggling = false;
   
   enum class DriveMode {
