@@ -1,5 +1,7 @@
 [Unit]
 Description=Bizarro Homer Robot Control Service
+After=BizarroHomerHardwareControl.service BizarroHomerDualShock4LEDControl.service
+
 [Service]
 Type=simple
 User=pi
@@ -8,5 +10,6 @@ ExecStart=/usr/local/bin/BizarroHomer
 Restart=on-failure
 RestartSec=5
 KillMode=process
+
 [Install]
 WantedBy=multi-user.target
