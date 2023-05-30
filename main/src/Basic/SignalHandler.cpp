@@ -28,12 +28,13 @@ bool SignalHandler::should_exit() {
 void SignalHandler::sig_handler(int sig) {
   sig_encountered = true;
   
-  fmt::print("Signal {} caught\n", sig);
+  fmt::print("Signal {} caught. Exiting now...\n", sig);
   
+  // Disable hardware.
   HardwareManager::get()->set_enabled(false);
   
+  // Set controller LED colors to signify program ended.
   DualShock4_LEDManager::get()->set_alternating_colors(Color(0, 0, 255), Color(0, 0, 0));
-  
 }
 
 SignalHandler SignalHandler::instance;
