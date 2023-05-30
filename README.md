@@ -14,10 +14,30 @@ The hardware control program is run as the root user. It contols the motors, enc
 The DualShock4 LED control program is run as the root user. It controls the LEDs on the DualShock4 controller. The LED colors signify different states/errors of the robot program. For example, if the main program exits then the LEDs will signify that to alert the driver.
 
 ## General Setup
-1. Run the `setup.sh` script
-2. [Pair a DualShock4 controller](#Pairing-DualShock4-Controller)
-3. Compile and install using CMake
-4. Restart Raspberry Pi
+1. Enable hardware control
+   - Add these lines to `/boot/config.txt` to assign hardware pins.
+     ```
+     dtoverlay=pwm-2chan,pin=12,func=4,pin2=13,func2=4
+     ```
+2. Setup workspace
+   - Create directory `/var/frc151/BizarroHomer` and give the pi user permissions to access it.
+     ```bash
+     $ sudo mkdir -p /var/frc1511/BizarroHomer
+     $ sudo chown pi: /var/frc1511
+     $ sudo chmod u+w /var/frc1511
+     ```
+   - Create IPC Message Queue Key file.
+     ```bash
+     $ touch /var/frc1511/BizarroHomer/ipc_msg_queue_key
+     ```
+3. Install tools
+   ```
+   $ sudo apt-get update
+   $ sudo apt-get install -y --no-install-recommends bluez libsdl2-dev
+   ```
+4. Restart Raspberry Pi for changes to take effect.
+5. [Pair a DualShock4 controller](#Pairing-DualShock4-Controller)
+6. Compile and install using CMake
 
 ## Pairing DualShock4 Controller
 Start up bluetoothctl.
