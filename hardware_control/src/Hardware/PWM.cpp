@@ -10,7 +10,13 @@ PWM::PWM(int _channel)
   channel_dir(fmt::format("/sys/class/pwm/pwmchip0/pwm{}", channel)),
   enable_path(channel_dir / "enable"),
   period_path(channel_dir / "period"),
-  duty_cycle_path(channel_dir / "duty_cycle") { }
+  duty_cycle_path(channel_dir / "duty_cycle") {
+  
+  std::string channel_str(fmt::format("{}", channel));
+  int export_fd = open("/sys/class/pwm/pwmchip0/export", O_WRONLY | O_CREAT | O_TRUNC);
+  write(export_fd, channel_str.c_str(), channel_str.length());
+  close(export_fd);
+}
 
 void PWM::set_duty_cycle(int duty_cycle) {
   std::string msg(std::to_string(duty_cycle));
