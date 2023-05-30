@@ -76,10 +76,13 @@ Now the Bluetooth device should automatically connect to the Pi. To check paired
 ## DualShock4 LED Status Paterns
 The LEDs on the DualShock4 controller is used to signify different states/errors of the robot program. 
 
-| Color          | Description                 |
-| -------------- | --------------------------- |
-| Flashing White | Controller is searching for robot. Give it some time to connect. If controller turns off, turn it back on again until it connects. |
-| <span style="color:green">Solid Green</span>    | Everything is good          |
-| <span style="color:green">Flashing Green</span> | Robot pressurized and armed. Be on alert and step away from the robot. |
-| <span style="color:blue">Solid Blue</span>          | Controller is connected, although main program and/or LED control program is not running. Probably just have to wait. |
-| <span style="color:blue">Flashing Blue</span>  | Main program stopped/crashed. Wait for it to reboot. |
+| Color           | Description                 |
+| --------------- | --------------------------- |
+| ⬜️ Flashing White  | Controller is searching for robot. Give it some time to connect. If controller turns off, turn it back on again until it connects. |
+| 🟩 Solid Green     | Everything is good |
+| 🟩 Flashing Green  | Robot pressurized and armed. Be on alert and step away from the robot. |
+| 🟦 Solid Blue      | Controller is connected, although main program and/or LED control program is not running. Probably just have to wait for them to start up. |
+| 🟦 Flashing Blue   | Main program stopped/crashed. Wait for it to reboot. |
+| 🟥 Flashing Red    | Robot battery low. |
+| 🟨 Flashing Yellow | DualShock4 battery low. |
+| Off                | LED control program isn't running, or the controller is turned off/out of battery. If the controller is off, Peter is disappointed. |
