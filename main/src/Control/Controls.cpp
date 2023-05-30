@@ -25,7 +25,7 @@ void Controls::process() {
     // Controller not connected...
     // TODO: Do something crazy.
     
-    drive->control(0.0, 0.0);
+    drive->tank_control(0.0, 0.0);
     
     fmt::print("Controller {} not connected\n", GC_DRIVER);
     return;
@@ -34,22 +34,36 @@ void Controls::process() {
   // Get input from controller.
   GameControllerManager::get()->get_input(GC_DRIVER, &frame);
   
+  // Toggle drive.
+  {
+    bool toggle_drive = false;
+    bool should_toggle_drive = frame.buttons & DualShock4_Button::TRIANGLE;
+    
+    if (should_toggle_drive) toggle_drive = !was_drive_toggling;
+    was_drive_toggling = should_toggle_drive;
+    
+    if (toggle_drive) {
+      drive_mode = (drive_mode == DriveMode::ARCADE) ? DriveMode::TANK : DriveMode::ARCADE;
+    }
+  }
+  
   auto improve_axis = [](double axis) -> double {
-      return std::sin(axis * M_PI_2);
+    // Deadzone.
+    if (std::abs(axis) < 0.1) return 0.0;
+    // Model sine curve.
+    return std::sin(axis * M_PI_2);
   };
-  
-  double left = improve_axis(frame.axes[DualShock4_Axis::LEFT_Y]);
-  double right = improve_axis(frame.axes[DualShock4_Axis::RIGHT_Y]);
-  
-  // Deadzones.
-  if (std::abs(left) < 0.1) {
-    left = 0.0;
+
+  if (drive_mode == DriveMode::ARCADE) {
+    double forwards = -improve_axis(frame.axes[DualShock4_Axis::LEFT_Y]);
+    double turn = improve_axis(frame.axes[DualShock4_Axis::RIGHT_X]);
+    
+    drive->arcade_control(forwards, turn);
   }
-  if (std::abs(right) < 0.1) {
-    right = 0.0;
+  else {
+    double left = -improve_axis(frame.axes[DualShock4_Axis::LEFT_Y]);
+    double right = -improve_axis(frame.axes[DualShock4_Axis::RIGHT_Y]);
+    
+    drive->tank_control(left, right);
   }
-  
-  fmt::print("controlling drive: {} ---- {}\n", left, right);
-  
-  drive->control(left, right);
 }

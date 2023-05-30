@@ -13,4 +13,12 @@ public:
   
 private:
   Drive* drive;
+  
+  bool was_drive_toggling = false;
+  
+  enum class DriveMode {
+    TANK = 0,
+    ARCADE = 1,
+  };
+  DriveMode drive_mode = DriveMode::ARCADE;
 };

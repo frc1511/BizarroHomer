@@ -11,7 +11,8 @@ public:
   
   void process() override;
   
-  void control(double left_pct, double right_pct);
+  void tank_control(double left, double right);
+  void arcade_control(double forwards, double turn);
   
 private:
   PWMSparkMax drive_left  { PWM_DRIVE_LEFT };

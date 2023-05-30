@@ -1,4 +1,6 @@
 #include <BizarroHomer/Drive/Drive.hpp>
+#include <cmath>
+#include <algorithm>
 
 Drive::Drive() {
 
@@ -13,7 +15,13 @@ void Drive::process() {
   drive_right.set_percent(-target_right);
 }
 
-void Drive::control(double l, double r) {
-  target_left = l;
-  target_right = r;
+void Drive::tank_control(double left, double right) {
+  target_left = left;
+  target_right = right;
+}
+
+void Drive::arcade_control(double forwards, double turn) {
+  // A real simple arcade drive.
+  target_left = std::clamp(forwards - turn, -1.0, 1.0);
+  target_right = std::clamp(forwards + turn, -1.0, 1.0);
 }
