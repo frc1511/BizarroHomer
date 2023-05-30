@@ -4,6 +4,7 @@
 #include <fmt/format.h>
 #include <csignal>
 #include <cstring>
+#include <unistd.h>
 
 #define IPC_MSG_SIZE 7
 
@@ -18,6 +19,11 @@ void sig_handler(int s) {
 }
 
 int main() {
+  if (geteuid() != 0) {
+    fmt::print("Must be run as root\n");
+    return 1;
+  }
+  
   signal(SIGHUP,  sig_handler);
   signal(SIGINT,  sig_handler);
   signal(SIGQUIT, sig_handler);

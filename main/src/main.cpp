@@ -4,8 +4,14 @@
 #include <fmt/core.h>
 #include <thread>
 #include <chrono>
+#include <unistd.h>
 
 int main() {
+  if (geteuid() == 0) {
+    fmt::print("Should not be run as root\n");
+    return 1;
+  }
+  
   // Reset and enable all hardware.
   HardwareManager::get()->reset_hardware();
   HardwareManager::get()->set_enabled(true);
