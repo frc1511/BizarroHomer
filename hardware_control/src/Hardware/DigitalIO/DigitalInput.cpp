@@ -1,4 +1,4 @@
-#include <BizarroHomerHardwareControl/Hardware/DigitalInput.hpp>
+#include <BizarroHomerHardwareControl/Hardware/DigitalIO/DigitalInput.hpp>
 #include <fmt/core.h>
 #include <string>
 #include <sys/ioctl.h>

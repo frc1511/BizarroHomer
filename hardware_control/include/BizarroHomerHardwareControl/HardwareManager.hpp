@@ -4,8 +4,8 @@
 #define Phoenix_No_WPI
 #include <ctre/Phoenix.h>
 #include <BizarroHomerHardwareControl/Hardware/Encoder/DutyCycleEncoder.hpp>
-#include <BizarroHomerHardwareControl/Hardware/DigitalInput.hpp>
-#include <BizarroHomerHardwareControl/Hardware/DigitalOutput.hpp>
+#include <BizarroHomerHardwareControl/Hardware/DigitalIO/DigitalInput.hpp>
+#include <BizarroHomerHardwareControl/Hardware/DigitalIO/DigitalOutput.hpp>
 #include <BizarroHomerShared/IPC/IPCSender.hpp>
 #include <map>
 #include <memory>
