@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <filesystem>
+
 class DigitalInput {
 public:
   DigitalInput(int channel);
@@ -8,4 +11,7 @@ public:
   bool get();
   
 private:
+  int channel;
+  
+  std::filesystem::path channel_dir, dir_path, val_path;
 };
