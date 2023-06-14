@@ -1,6 +1,7 @@
 #include <BizarroHomerHardwareControl/HardwareManager.hpp>
 #include <BizarroHomerShared/IPC/IPCReceiver.hpp>
 #include <ctre/phoenix/unmanaged/Unmanaged.h>
+#include <ctre/phoenix/cci/PDP_CCI.h>
 #include <fmt/core.h>
 
 enum ControlMessageType {
@@ -15,7 +16,8 @@ enum HardwareType {
   HTYPE_DIG_OUT = 1,
   HTYPE_CAN_TALON_FX = 2,
   HTYPE_PWM_SPARK_MAX = 3,
-  HTYPE_ENC = 4,
+  HTYPE_ABS_THROUGH_BORE = 4,
+  HTYPE_CAN_PDP = 5,
 };
 
 struct IPCControlMessage {
@@ -49,10 +51,12 @@ struct IPCStatusMessage {
 enum StatusProperty {
   SPROP_ENC = 0,
   SPROP_DIG = 1,
+  SPROP_ANG = 2,
+  SPROP_VAL = 3,
 };
 
 HardwareManager::HardwareManager()
-: recv_thread([&]() { this->recv_thread_main(); }), s(IPC_PATHNAME, 'S') { }
+: s(IPC_PATHNAME, 'S'), recv_thread([&]() { this->recv_thread_main(); }) { }
 
 HardwareManager::~HardwareManager() {
   terminate();
@@ -71,10 +75,11 @@ void HardwareManager::send_status_msgs() {
     s.send_msg(msg);
   }
   // Encoders.
-  msg.data.hardware_type = HTYPE_ENC;
-  for (const auto& [id, e] : encoders) {
+  msg.data.hardware_type = HTYPE_ABS_THROUGH_BORE;
+  msg.data.hardware_prop = SPROP_ANG;
+  for (const auto& [id, e] : through_bores) {
     msg.data.hardware_id = id;
-    msg.data.value = e->get();
+    msg.data.value = e->get_angle();
     s.send_msg(msg);
   }
   // Digital Inputs.
@@ -85,6 +90,20 @@ void HardwareManager::send_status_msgs() {
     msg.data.value = static_cast<double>(i->get());
     s.send_msg(msg);
   }
+  // PDP Voltage.
+  /* { */
+  /*   double voltage = -1; */
+  /*   double* currents = {}; */
+  /*   int filled = 0; */
+  /*   int er = (int)c_PDP_GetValues(0, &voltage, currents, 0, &filled); */
+  /*   if (er == 0) { */
+  /*     msg.data.hardware_type = HTYPE_CAN_PDP; */
+  /*     msg.data.hardware_prop = SPROP_VAL; */
+  /*     msg.data.hardware_id = 0; */
+  /*     msg.data.value = (int)(voltage * 100); */
+  /*     s.send_msg(msg); */
+  /*   } */
+  /* } */
 }
 
 void HardwareManager::process_hardware() {
@@ -147,7 +166,7 @@ void HardwareManager::recv_thread_main() {
         std::lock_guard<std::mutex> lk(hardware_mut);
         spark_maxes.clear();
         talon_fxs.clear();
-        encoders.clear();
+        through_bores.clear();
         digital_inputs.clear();
         digital_outputs.clear();
         fmt::print("Reset message received.\n");
@@ -170,10 +189,12 @@ void HardwareManager::recv_thread_main() {
       switch (t) {
         case HTYPE_DIG_IN:
           digital_inputs[id] = std::make_unique<DigitalInput>(id);
+          fmt::print("Intialized DigitalInput at channel: {}\n", id);
           break;
         case HTYPE_DIG_OUT:
           {
             auto& [o, s] = (digital_outputs[id] = std::make_pair(std::make_unique<DigitalOutput>(id), static_cast<int>(v)));
+            fmt::print("Intialized DigitalOutput at channel: {}\n", id);
             // Set to default position, if has default position.
             if (s) {
               o->set(static_cast<bool>(s - 1));
@@ -183,6 +204,7 @@ void HardwareManager::recv_thread_main() {
         case HTYPE_CAN_TALON_FX:
           {
             auto& t = (talon_fxs[id] = std::make_unique<TalonFX>(id));
+            fmt::print("Intialized CAN TalonFX at CAN ID: {}\n", id);
             // Set to stopped.
             t->Set(TalonFXControlMode::PercentOutput, 0.0);
           }
@@ -190,12 +212,14 @@ void HardwareManager::recv_thread_main() {
         case HTYPE_PWM_SPARK_MAX:
           {
             auto& s = (spark_maxes[id] = std::make_unique<PWMSparkMax>(id));
+            fmt::print("Intialized PWM SparkMax at pwm{}\n", id);
             // Set to stopped.
             s->set(0.0);
           }
           break;
-        case HTYPE_ENC:
-          encoders[id] = std::make_unique<DutyCycleEncoder>(id);
+        case HTYPE_ABS_THROUGH_BORE:
+          through_bores[id] = std::make_unique<DutyCycleThroughBore>(id);
+          fmt::print("Intialized Through Bore Encoder at channel: {}\n", id);
           break;
       }
       continue;
@@ -219,7 +243,7 @@ void HardwareManager::recv_thread_main() {
     std::lock_guard<std::mutex> lk(hardware_mut);
     switch (t) {
       case HTYPE_DIG_IN:
-      case HTYPE_ENC:
+      case HTYPE_ABS_THROUGH_BORE:
         // Sensors that cannot be controlled.
         warn_invalid_prop();
         break;

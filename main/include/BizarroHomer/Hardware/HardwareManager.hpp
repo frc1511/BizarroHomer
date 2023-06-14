@@ -26,25 +26,28 @@ public:
   void reset_hardware();
   
   enum class HardwareType : uint8_t {
-    DIGITAL_IN    = 0,
-    DIGITAL_OUT   = 1,
-    CAN_TALON_FX  = 2,
-    PWM_SPARK_MAX = 3,
-    ENCODER       = 4,
+    DIGITAL_IN       = 0,
+    DIGITAL_OUT      = 1,
+    CAN_TALON_FX     = 2,
+    PWM_SPARK_MAX    = 3,
+    ABS_THROUGH_BORE = 4,
+    CAN_PDP          = 5,
   };
   
   enum class ControlProperty : uint8_t {
     INIT     = 0,
     DIGITAL  = 1,
-    PERCENT = 2,
+    PERCENT  = 2,
     POSITION = 3,
   };
   
   void send_ctrl_msg(HardwareType type, uint8_t id, ControlProperty prop, double value);
   
   enum class StatusProperty : uint8_t {
-    ENCODER,
-    DIGITAL,
+    ENCODER = 0,
+    DIGITAL = 1,
+    ANGLE   = 2,
+    VALUE   = 3,
   };
   
   using StatusCallbackFunc = std::function<void(double value)>;
@@ -54,6 +57,8 @@ public:
 private:
   HardwareManager();
   ~HardwareManager();
+  
+  IPCSender s;
   
   std::thread status_thread;
   std::mutex control_mutex,
@@ -68,8 +73,6 @@ private:
   std::vector<std::pair<StatusCallbackID, StatusCallbackFunc>> status_callbacks;
   
   void status_thread_main();
-  
-  IPCSender s;
   
   static HardwareManager instance;
 };

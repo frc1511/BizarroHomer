@@ -34,7 +34,7 @@ struct IPCStatusMessage {
 };
 
 HardwareManager::HardwareManager()
-: s(IPC_PATHNAME, 'C') { }
+: s(IPC_PATHNAME, 'C'), status_thread([this]() { this->status_thread_main(); }) { }
 
 HardwareManager::~HardwareManager() { }
 
@@ -64,7 +64,7 @@ void HardwareManager::reset_hardware() {
 
 void HardwareManager::send_ctrl_msg(HardwareType type, uint8_t id, ControlProperty prop, double value) {
   IPCControlMessage msg;
-  msg.mtype = 1;//
+  msg.mtype = 1;
   msg.data.control_type = MSG_CONTROL;
   msg.data.hardware_type = static_cast<uint8_t>(type);
   msg.data.hardware_id = id;

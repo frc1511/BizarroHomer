@@ -32,7 +32,6 @@ void Controls::process() {
   }
   
   if (!was_conn) {
-    fmt::print("green!!\n");
     DualShock4_LEDManager::get()->set_color(Color(0, 255, 0));
     was_conn = true;
   }
