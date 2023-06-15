@@ -34,7 +34,7 @@ void SignalHandler::sig_handler(int sig) {
   HardwareManager::get()->set_enabled(false);
   
   // Set controller LED colors to signify program ended.
-  DualShock4_LEDManager::get()->set_alternating_colors(Color(0, 0, 255), Color(0, 0, 0));
+  DualShock4_LEDManager::get()->set_colors(DualShock4_LEDManager::ColorBits::BLUE | DualShock4_LEDManager::ColorBits::OFF);
 }
 
 SignalHandler SignalHandler::instance;

@@ -6,11 +6,12 @@
 #include <cstring>
 #include <unistd.h>
 
-#define IPC_MSG_SIZE 7
-
 struct IPCMessage {
-  long mtype;
-  char mtext[IPC_MSG_SIZE]; // r1, g1, b1, r2, g2, b2, update_controllers
+  long mtype = 1;
+  struct Data {
+    uint8_t update_ctrl;
+    uint8_t colors;
+  } data;
 };
 
 std::sig_atomic_t sig = 0;
@@ -34,7 +35,6 @@ int main() {
   IPCReceiver r(IPC_PATHNAME, 'D');
   
   IPCMessage msg;
-  std::memset(&msg, 0, sizeof(IPCMessage));
   
   {
     LEDHandler led_handler;
@@ -42,13 +42,10 @@ int main() {
     while (!sig) {
       if (!r.recv_msg(&msg)) break;
       
-      if (msg.mtext[6]) {
+      if (msg.data.update_ctrl) {
         led_handler.set_should_update_controllers();
       }
-      led_handler.set_colors(
-        Color { msg.mtext[0], msg.mtext[1], msg.mtext[2] },
-        Color { msg.mtext[3], msg.mtext[4], msg.mtext[5] }
-      );
+      led_handler.set_colors(msg.data.colors);
     }
   }
   

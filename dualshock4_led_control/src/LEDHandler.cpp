@@ -13,12 +13,12 @@ LEDHandler::~LEDHandler() {
   terminate();
 }
 
-void LEDHandler::set_colors(Color _col_1, Color _col_2) {
+void LEDHandler::set_colors(uint8_t _colors) {
   std::lock_guard<std::mutex> lk(led_mutex);
-  new_col = true;
-  col_1 = _col_1;
-  col_2 = _col_2;
+  colors = _colors;
+  new_cols = true;
 }
+
 
 void LEDHandler::set_should_update_controllers() {
   std::lock_guard<std::mutex> lk(led_mutex);
@@ -50,43 +50,70 @@ void LEDHandler::update_controllers() {
 }
 
 void LEDHandler::led_thread_main() {
-  Color c[2] = { Color { 0, 0, 0 }, Color { 0, 0, 0 } };
   bool upd = false;
+  uint8_t cols = 0;
   while (true) {
     {
       std::lock_guard<std::mutex> lk(led_mutex);
-      if (new_col) {
-        c[0] = col_1;
-        c[1] = col_2;
-        new_col = false;
-        
+      if (new_cols) {
+        cols = colors;
+        new_cols = false;
       }
       upd = upd_ctrl;
       upd_ctrl = false;
       if (should_term) return;
     }
-
+    
     if (upd) update_controllers();
     
-    for (int i = 0; i < 2; i++) {
-      std::string r_str = std::to_string(c[i].r);
-      std::string g_str = std::to_string(c[i].g);
-      std::string b_str = std::to_string(c[i].b);
-      
-      for (const auto& d : ctrl_paths) {
-        int fd = open(fmt::format("{}red/brightness", d).c_str(), O_WRONLY | O_CREAT | O_TRUNC);
-        write(fd, r_str.c_str(), r_str.length());
-        close(fd);
-        fd = open(fmt::format("{}green/brightness", d).c_str(), O_WRONLY | O_CREAT | O_TRUNC);
-        write(fd, g_str.c_str(), g_str.length());
-        close(fd);
-        fd = open(fmt::format("{}blue/brightness", d).c_str(), O_WRONLY | O_CREAT | O_TRUNC);
-        write(fd, b_str.c_str(), b_str.length());
-        close(fd);
+    for (int i = 0; i < 7; i++) {
+      uint8_t bit = 1 << i;
+      if (cols & bit) {
+        uint8_t r, g, b;
+        switch (bit) {
+          case RED:
+            r = 255, g = 0, b = 0;
+            break;
+          case ORANGE:
+            r = 255, g = 128, b = 0;
+            break;
+          case YELLOW:
+            r = 255, g = 255, b = 0;
+            break;
+          case GREEN:
+            r = 0, g = 255, b = 0;
+            break;
+          case BLUE:
+            r = 0, g = 0, b = 255;
+            break;
+          case PURPLE:
+            r = 255, g = 0, b = 255;
+            break;
+          case OFF:
+          default:
+            r = g = b = 0;
+            break;
+        }
+        
+        std::string r_str = std::to_string(r);
+        std::string g_str = std::to_string(g);
+        std::string b_str = std::to_string(b);
+        
+        for (const auto& d : ctrl_paths) {
+          int fd = open(fmt::format("{}red/brightness", d).c_str(), O_WRONLY | O_CREAT | O_TRUNC);
+          write(fd, r_str.c_str(), r_str.length());
+          close(fd);
+          fd = open(fmt::format("{}green/brightness", d).c_str(), O_WRONLY | O_CREAT | O_TRUNC);
+          write(fd, g_str.c_str(), g_str.length());
+          close(fd);
+          fd = open(fmt::format("{}blue/brightness", d).c_str(), O_WRONLY | O_CREAT | O_TRUNC);
+          write(fd, b_str.c_str(), b_str.length());
+          close(fd);
+        }
+        
+        using namespace std::literals::chrono_literals;
+        std::this_thread::sleep_for(0.25s);
       }
-      
-      using namespace std::literals::chrono_literals;
-      std::this_thread::sleep_for(0.25s);
     }
   }
 }

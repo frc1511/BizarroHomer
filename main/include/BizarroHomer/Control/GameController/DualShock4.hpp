@@ -45,16 +45,24 @@ public:
   DualShock4_LEDManager(DualShock4_LEDManager const&) = delete;
   DualShock4_LEDManager& operator=(DualShock4_LEDManager const&) = delete;
   
-  void set_color(Color col);
-  void set_alternating_colors(Color col_1, Color col_2);
+  enum ColorBits {
+    RED    = 1 << 0,
+    ORANGE = 1 << 1,
+    YELLOW = 1 << 2,
+    GREEN  = 1 << 3,
+    BLUE   = 1 << 4,
+    PURPLE = 1 << 5,
+    OFF    = 1 << 6,
+  };
+  
+  void set_colors(uint8_t colors);
   void update_controllers();
   
 private:
   DualShock4_LEDManager();
   ~DualShock4_LEDManager();
   
-  Color col_1 { 0, 0, 0 },
-        col_2 { 0, 0, 0 };
+  uint8_t colors = 0;
 
   void send_msg(bool update_ctrl);
   

@@ -3,11 +3,12 @@
 #include <cstring>
 #include <cerrno>
 
-#define IPC_MSG_SIZE 7
-
 struct IPCMessage {
-  long mtype;
-  char mtext[IPC_MSG_SIZE]; // r1, g1, b1, r2, g2, b2, update_controllers
+  long mtype = 1;
+  struct Data {
+    uint8_t update_ctrl;
+    uint8_t colors;
+  } data;
 };
 
 DualShock4_LEDManager::DualShock4_LEDManager()
@@ -18,17 +19,9 @@ DualShock4_LEDManager::DualShock4_LEDManager()
 
 DualShock4_LEDManager::~DualShock4_LEDManager() { }
 
-void DualShock4_LEDManager::set_color(Color col) {
+void DualShock4_LEDManager::set_colors(uint8_t _colors) {
   std::lock_guard<std::mutex> lk(led_mutex);
-  col_1 = col;
-  col_2 = col;
-  send_msg(false);
-}
-
-void DualShock4_LEDManager::set_alternating_colors(Color _col_1, Color _col_2) {
-  std::lock_guard<std::mutex> lk(led_mutex);
-  col_1 = _col_1;
-  col_2 = _col_2;
+  colors = _colors;
   send_msg(false);
 }
 
@@ -39,15 +32,8 @@ void DualShock4_LEDManager::update_controllers() {
 
 void DualShock4_LEDManager::send_msg(bool update_ctrl) {
   IPCMessage msg;
-  msg.mtext[0] = col_1.get_r();
-  msg.mtext[1] = col_1.get_g();
-  msg.mtext[2] = col_1.get_b();
-  msg.mtext[3] = col_2.get_r();
-  msg.mtext[4] = col_2.get_g();
-  msg.mtext[5] = col_2.get_b();
-  msg.mtext[6] = static_cast<char>(update_ctrl);
-  
-  msg.mtype = 1;
+  msg.data.update_ctrl = static_cast<uint8_t>(update_ctrl);
+  msg.data.colors = colors;
   s.send_msg(msg);
 }
 

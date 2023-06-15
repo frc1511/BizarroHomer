@@ -32,9 +32,28 @@ void Controls::process() {
   }
   
   if (!was_conn) {
-    DualShock4_LEDManager::get()->set_color(Color(0, 255, 0));
+    DualShock4_LEDManager::get()->set_colors(DualShock4_LEDManager::ColorBits::RED | DualShock4_LEDManager::ColorBits::YELLOW | DualShock4_LEDManager::ColorBits::PURPLE);
     was_conn = true;
   }
+
+  /*
+  colors = 0;
+  if (pdp_voltage < 11.8) {
+    // red
+  }
+  if (controller_voltage < 40) {
+    // yellow
+  }
+  if (pressurized) {
+    // purple
+  }
+  if (!colors) {
+    // green
+  }
+  if (colors != last_colors) {
+    // update
+  }
+  */
   
   // Get input from controller.
   GameControllerManager::get()->get_input(GC_DRIVER, &frame);
