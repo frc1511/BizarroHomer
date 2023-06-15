@@ -12,8 +12,8 @@ Drive::~Drive() {
 }
 
 void Drive::process() {
-  drive_left.set_percent(-target_left * 0.3);
-  drive_right.set_percent(target_right * 0.3);
+  /* drive_left.set_percent(-target_left * 0.3); */
+  /* drive_right.set_percent(target_right * 0.3); */
   
   /* talon.set_percent(0.2); */
   /* fmt::print("talon: {}\n", talon.get_position()); */
