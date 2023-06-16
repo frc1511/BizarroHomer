@@ -1,15 +1,17 @@
 [Unit]
-Description=Bizarro Homer Robot Control Service
+Description=Robot Control
 After=BizarroHomerHardwareControl.service BizarroHomerDualShock4LEDControl.service
 
 [Service]
 Type=simple
 User=pi
 Group=pi
-ExecStart=/usr/local/bin/BizarroHomer
+ExecStart=/usr/local/bin/BizarroHomerMain
 Restart=on-failure
 RestartSec=5
 KillMode=process
+StandardOutput=file:/var/frc1511/BizarroHomer/diagnostic_server/main_output.log
+StandardError=file:/var/frc1511/BizarroHomer/diagnostic_server/main_error.log
 
 [Install]
 WantedBy=multi-user.target

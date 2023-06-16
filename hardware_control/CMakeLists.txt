@@ -16,9 +16,9 @@ file(GLOB_RECURSE BH_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 add_executable(${PROJECT_NAME} ${BH_SOURCES})
 
-target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
-target_link_libraries(${PROJECT_NAME} PUBLIC BizarroHomerShared)
+target_link_libraries(${PROJECT_NAME} PRIVATE BizarroHomerShared)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -26,10 +26,19 @@ if(NOT Threads_FOUND)
   message(FATAL_ERROR "Pthread not found.")
 endif()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads)
+target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
 
 # fmt
-target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt)
+target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt)
 
 # Phoenix
-target_link_libraries(${PROJECT_NAME} PUBLIC Phoenix)
+target_link_libraries(${PROJECT_NAME} PRIVATE Phoenix)
+
+# Install program.
+install(TARGETS ${PROJECT_NAME} DESTINATION "/usr/local/bin")
+
+# Install systemd service.
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/BizarroHomerHardwareControl.service" DESTINATION "/etc/systemd/system")
+
+# Enable systemd service.
+install(CODE "execute_process(COMMAND systemctl enable BizarroHomerHardwareControl.service)")
