@@ -89,21 +89,34 @@ void ConnectionManager::handle_connection(int client_fd, bool* should_term) {
       else {
         std::string target_rel_path = request.get_target();
         
-        std::string target_abs_path = get_desired_target(target_rel_path, response_status);
-        if (!target_abs_path.empty()) {
-          // Get the file!!
-          int fd = open(target_abs_path.c_str(), O_RDONLY);
-          if (fd <= 0) {
-            if (response_status == HTTPResponse::Status::_200_OK) {
-              response_status = HTTPResponse::Status::_404_NOT_FOUND;
-            }
+        if (target_rel_path == "/values") {
+          static int g = 0;
+          static int q = 100;
+          static int w = 1000;
+          std::string str;
+          for (int i = 0; i < 100; i++) {
+            str += fmt::format("{},{}\n{},{}\n", g++, q++, w++, g);
           }
-          else {
-            len = read(fd, buf, sizeof(buf));
-            if (len < 0) {
-              len = 0;
+          strncpy(buf, str.c_str(), str.length());
+          len = str.length();
+        }
+        else {
+          std::string target_abs_path = get_desired_target(target_rel_path, response_status);
+          if (!target_abs_path.empty()) {
+            // Get the file!!
+            int fd = open(target_abs_path.c_str(), O_RDONLY);
+            if (fd <= 0) {
+              if (response_status == HTTPResponse::Status::_200_OK) {
+                response_status = HTTPResponse::Status::_404_NOT_FOUND;
+              }
             }
-            close(fd);
+            else {
+              len = read(fd, buf, sizeof(buf));
+              if (len < 0) {
+                len = 0;
+              }
+              close(fd);
+            }
           }
         }
       }

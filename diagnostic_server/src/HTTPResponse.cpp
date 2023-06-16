@@ -14,13 +14,10 @@ HTTPResponse::HTTPResponse(Status status, void* content, std::size_t content_siz
   response = fmt::format("HTTP/1.1 {}\n", status_str_map.at(status));
   response += "Connection: keep-alive\n";
   response += "Server: Bizarro Homer Diagnostic Server\n";
+  response += fmt::format("Content-Length: {}\n", content_size);
+  response += '\n';
   if (content_size) {
-    response += fmt::format("Content-Length: {}\n", content_size);
-    response += '\n';
     response += std::string((char*)content, content_size);
-  }
-  else {
-    response += '\n';
   }
 }
   

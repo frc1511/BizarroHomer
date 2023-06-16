@@ -1,0 +1,31 @@
+body {
+  font-family: Helvetica, sans-serif;
+}
+table {
+  border-collapse: separate;
+  border-spacing: 0 0;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #e6e6e6;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #e6e6e6;
+}
+
+th:first-of-type {
+  border-top-left-radius: 10px;
+}
+th:last-of-type {
+  border-top-right-radius: 10px;
+}
+tr:last-of-type td:first-of-type {
+  border-bottom-left-radius: 10px;
+}
+tr:last-of-type td:last-of-type {
+  border-bottom-right-radius: 10px;
+}

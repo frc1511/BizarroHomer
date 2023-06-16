@@ -19,10 +19,9 @@ void signal_handler(int status) {
 }
 
 int main(int argc, char** argv) {
-  fmt::print("pid: {}\n", getpid());
   signal(SIGINT, signal_handler);
   
-  int port = 8000;
+  int port = 80;
   
   if (argc == 2) {
     port = atoi(argv[1]);
@@ -31,7 +30,7 @@ int main(int argc, char** argv) {
   int server_fd;
   
   {
-    ConnectionManager conn_manager(8);
+    ConnectionManager conn_manager(4);
     
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd <= 0) {
