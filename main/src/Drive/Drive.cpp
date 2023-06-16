@@ -1,4 +1,5 @@
 #include <BizarroHomer/Drive/Drive.hpp>
+#include <BizarroHomer/Basic/FeedbackManager.hpp>
 #include <fmt/core.h>
 #include <cmath>
 #include <algorithm>
@@ -29,4 +30,8 @@ void Drive::arcade_control(double forwards, double turn) {
   // A real simple arcade drive.
   target_left = std::clamp(forwards + turn, -1.0, 1.0);
   target_right = std::clamp(forwards - turn, -1.0, 1.0);
+}
+
+void Drive::send_feedback() {
+  FeedbackManager::get()->send_value("Drive_Encoder", std::to_string(encoder.get_angle()));
 }

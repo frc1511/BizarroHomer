@@ -19,7 +19,7 @@ void signal_handler(int status) {
 }
 
 int main(int argc, char** argv) {
-  signal(SIGINT, signal_handler);
+  /* signal(SIGINT, signal_handler); */
   
   int port = 80;
   

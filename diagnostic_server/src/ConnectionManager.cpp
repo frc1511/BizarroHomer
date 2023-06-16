@@ -1,5 +1,6 @@
 #include <BizarroHomerDiagnosticServer/ConnectionManager.hpp>
 #include <BizarroHomerDiagnosticServer/HTTPRequest.hpp>
+#include <BizarroHomerDiagnosticServer/DataManager.hpp>
 #include <unistd.h>
 #include <sys/fcntl.h>
 #include <fmt/core.h>
@@ -90,13 +91,7 @@ void ConnectionManager::handle_connection(int client_fd, bool* should_term) {
         std::string target_rel_path = request.get_target();
         
         if (target_rel_path == "/values") {
-          static int g = 0;
-          static int q = 100;
-          static int w = 1000;
-          std::string str;
-          for (int i = 0; i < 100; i++) {
-            str += fmt::format("{},{}\n{},{}\n", g++, q++, w++, g);
-          }
+          std::string str = DataManager::get()->csv();
           strncpy(buf, str.c_str(), str.length());
           len = str.length();
         }
