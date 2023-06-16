@@ -39,6 +39,8 @@ static const std::map<std::string, HTTPMethod> method_str_map {
 };
 
 void HTTPRequest::parse_start_line() {
+  if (*iter < 'C' || *iter > 'T') throw std::exception();
+  
   // HTTP method.
   std::string method_str = Parser::parse_until(iter, request_str.cend(), " ");
   iter++;

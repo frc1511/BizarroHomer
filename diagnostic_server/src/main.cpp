@@ -15,16 +15,12 @@ volatile sig_atomic_t sig_status = 0;
 
 void signal_handler(int status) {
   sig_status = status;
+  fmt::print("caught signal: {}\n", status);
 }
 
 int main(int argc, char** argv) {
   fmt::print("pid: {}\n", getpid());
-  /* signal(SIGABRT, signal_handler); */
-  /* signal(SIGFPE, signal_handler); */
-  /* signal(SIGILL, signal_handler); */
-  /* signal(SIGINT, signal_handler); */
-  /* signal(SIGSEGV, signal_handler); */
-  /* signal(SIGTERM, signal_handler); */
+  signal(SIGINT, signal_handler);
   
   int port = 8000;
   

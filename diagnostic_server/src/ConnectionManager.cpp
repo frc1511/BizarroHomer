@@ -61,7 +61,7 @@ void ConnectionManager::handle_connection(int client_fd, bool* should_term) {
   using namespace std::literals::chrono_literals;
   auto start = std::chrono::steady_clock::now();
   
-  char buf[8192];
+  char buf[81920];
   while (!*should_term) {
     auto now = std::chrono::steady_clock::now();
     if (now - start >= 10s) {
@@ -76,42 +76,49 @@ void ConnectionManager::handle_connection(int client_fd, bool* should_term) {
       continue;
     }
     
-    HTTPRequest request(std::string(buf, len));
-    
     HTTPResponse::Status response_status = HTTPResponse::Status::_200_OK;
     
-    if (request.get_method() != HTTPMethod::GET) {
-      response_status = HTTPResponse::Status::_405_METHOD_NOT_ALLOWED;
-    }
-    
-    std::string target_rel_path = request.get_target();
-    
-    std::string target_abs_path = get_desired_target(target_rel_path, response_status);
-    if (!target_abs_path.empty()) {
-      // Get the file!!
-      int fd = open(target_abs_path.c_str(), O_RDONLY);
-      if (fd <= 0) {
-        if (response_status == HTTPResponse::Status::_200_OK) {
-          response_status = HTTPResponse::Status::_404_NOT_FOUND;
-        }
-        break;
+    try {
+      HTTPRequest request(std::string(buf, len));
+      
+      len = 0;
+      
+      if (request.get_method() != HTTPMethod::GET) {
+        response_status = HTTPResponse::Status::_405_METHOD_NOT_ALLOWED;
       }
       else {
-        len = read(fd, buf, sizeof(buf));
-        if (len < 0) {
-          len = 0;
+        std::string target_rel_path = request.get_target();
+        
+        std::string target_abs_path = get_desired_target(target_rel_path, response_status);
+        if (!target_abs_path.empty()) {
+          // Get the file!!
+          int fd = open(target_abs_path.c_str(), O_RDONLY);
+          if (fd <= 0) {
+            if (response_status == HTTPResponse::Status::_200_OK) {
+              response_status = HTTPResponse::Status::_404_NOT_FOUND;
+            }
+          }
+          else {
+            len = read(fd, buf, sizeof(buf));
+            if (len < 0) {
+              len = 0;
+            }
+            close(fd);
+          }
         }
-        close(fd);
       }
     }
+    catch (...) {
+      response_status = HTTPResponse::Status::_400_BAD_REQUEST;
+      len = 0;
+    }
     
-    HTTPResponse response(response_status, {}, buf, len);
+    HTTPResponse response(response_status, buf, len);
     std::string response_str = response.string();
     
     // Turn off non-blocking IO.
     int flags = fcntl(client_fd, F_GETFL, 0);
     fcntl(client_fd, F_SETFL, flags & ~O_NONBLOCK);
-
     
     ssize_t size = write(client_fd, response_str.c_str(), response_str.length());
     if (size < 0) {
@@ -151,7 +158,7 @@ std::string ConnectionManager::get_desired_target(std::string target_request, HT
     return target.string();
   }
   if (std::filesystem::is_directory(target)) {
-    target = SERVER_PATH / "index.html";
+    target /= "index.html";
     if (std::filesystem::is_regular_file(target)) {
       // Found index.html when asked for directory.
       return target.string();
