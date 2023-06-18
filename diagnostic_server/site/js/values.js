@@ -23,7 +23,7 @@ function update_val() {
   var xhr = new XMLHttpRequest();
 
   // Configure the request
-  xhr.open('GET', 'values', true);
+  xhr.open('GET', '/get/values', true);
 
   // Define the callback function
   xhr.onreadystatechange = function() {

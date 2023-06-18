@@ -5,6 +5,7 @@
 #include <chrono>
 #include <thread>
 #include <unistd.h>
+#include <ctime>
 
 std::sig_atomic_t sig = 0;
 void sig_handler(int s) {
@@ -16,6 +17,10 @@ int main() {
     fmt::print("Must be run as root\n");
     return 1;
   }
+  
+  std::time_t start_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+  fmt::print(stdout, "Hardware Control Service starting at {}\n", std::ctime(&start_time));
+  fmt::print(stderr, "Hardware Control Service starting at {}\n", std::ctime(&start_time));
   
   signal(SIGHUP,  sig_handler);
   signal(SIGINT,  sig_handler);

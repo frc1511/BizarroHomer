@@ -5,12 +5,17 @@
 #include <thread>
 #include <chrono>
 #include <unistd.h>
+#include <ctime>
 
 int main() {
   if (geteuid() == 0) {
     fmt::print("Should not be run as root\n");
     return 1;
   }
+  
+  std::time_t start_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+  fmt::print(stdout, "Main Service starting at {}\n", std::ctime(&start_time));
+  fmt::print(stderr, "Main Service starting at {}\n", std::ctime(&start_time));
   
   // Reset and enable all hardware.
   HardwareManager::get()->reset_hardware();

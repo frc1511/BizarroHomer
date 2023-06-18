@@ -1,6 +1,17 @@
 body {
   font-family: Helvetica, sans-serif;
+  background-color: #181a1b;
+  color: #ffffff;
 }
+
+a:link, a:visited {
+  color: blue;
+}
+
+a:hover, a:active {
+  color: dodgerblue;
+}
+
 table {
   border-collapse: separate;
   border-spacing: 0 0;
@@ -28,4 +39,20 @@ tr:last-of-type td:first-of-type {
 }
 tr:last-of-type td:last-of-type {
   border-bottom-right-radius: 10px;
+}
+
+.output_box {
+  padding: 5px;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  margin: 0;
+}
+
+pre {
+  overflow-x: auto;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
 }

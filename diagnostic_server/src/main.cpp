@@ -10,16 +10,23 @@
 #include <cstring>
 #include <csignal>
 #include <fmt/core.h>
+#include <chrono>
+#include <ctime>
 
 volatile sig_atomic_t sig_status = 0;
 
 void signal_handler(int status) {
   sig_status = status;
-  fmt::print("caught signal: {}\n", status);
+  fmt::print(stdout, "caught signal: {}\n", status);
+  fmt::print(stderr, "caught signal: {}\n", status);
 }
 
 int main(int argc, char** argv) {
   /* signal(SIGINT, signal_handler); */
+  
+  std::time_t start_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+  fmt::print(stdout, "Diagnostic Server Service starting at {}", std::ctime(&start_time));
+  fmt::print(stderr, "Diagnostic Server Service starting at {}", std::ctime(&start_time));
   
   int port = 80;
   
@@ -34,7 +41,7 @@ int main(int argc, char** argv) {
     
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd <= 0) {
-      fmt::print("socket() failed:\n\t{}\n", strerror(errno));
+      fmt::print(stderr, "socket() failed:\n\t{}\n", strerror(errno));
       return 1;
     }
     
@@ -61,7 +68,7 @@ int main(int argc, char** argv) {
       return 3;
     }
     
-    fmt::print("HTTP/1.1 Server running on port {}\n", port);
+    fmt::print(stdout, "HTTP/1.1 Server running on port {}\n", port);
     
     while (!sig_status) {
       struct sockaddr_in client_addr;
@@ -88,7 +95,7 @@ int main(int argc, char** argv) {
         fmt::print(stderr, "setsocketopt(), failed to set SO_KEEPALIVE: \n\t{}\n", strerror(errno));
       };
       
-      fmt::print("Accepted connection from {}\n", inet_ntoa(client_addr.sin_addr));
+      fmt::print(stdout, "Accepted connection from {}\n", inet_ntoa(client_addr.sin_addr));
 
       conn_manager.handle_new_connection(client_fd);
     }

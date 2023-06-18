@@ -14,6 +14,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 file(GLOB_RECURSE BH_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
+set(CMAKE_INSTALL_RPATH "/usr/local/lib")
+
 add_executable(${PROJECT_NAME} ${BH_SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/")

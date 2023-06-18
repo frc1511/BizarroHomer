@@ -90,7 +90,7 @@ void ConnectionManager::handle_connection(int client_fd, bool* should_term) {
       else {
         std::string target_rel_path = request.get_target();
         
-        if (target_rel_path == "/values") {
+        if (target_rel_path == "/get/values") {
           std::string str = DataManager::get()->csv();
           strncpy(buf, str.c_str(), str.length());
           len = str.length();
