@@ -22,7 +22,7 @@ public:
    *
    * @param direction The direction to rotate the barrel.
    */
-  void rotate_barrel(RotationDirection direction);
+  void rotate(RotationDirection direction);
   
   /**
    * @brief Returns whether the barrel should be rotating (when it's not at its

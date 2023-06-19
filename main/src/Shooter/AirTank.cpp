@@ -81,3 +81,7 @@ bool AirTank::has_pressure() {
   // TODO: Detect pressure...
   return false;
 }
+
+bool AirTank::is_shooting() {
+  return fill_valve.get();
+}

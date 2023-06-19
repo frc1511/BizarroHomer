@@ -61,7 +61,6 @@ void GameControllerManager::thrd_main() {
           // Open a Jostick at id.
           SDL_Joystick* j = SDL_JoystickOpen(i);
           if (!j) {
-            fmt::print("SDL_JoystickOpen({}) failed.\n", i);
             continue;
           }
           DualShock4_LEDManager::get()->update_controllers();
@@ -81,7 +80,7 @@ void GameControllerManager::thrd_main() {
       if (ev.type == SDL_QUIT) break;
       // Handle disconnection.
       if (ev.jdevice.type == SDL_JOYDEVICEREMOVED) {
-        fmt::print("Controller disconnected\n");
+        fmt::print(stderr, "Controller disconnected\n");
         uint16_t which = ev.jdevice.which;
         // Close joystick.
         SDL_JoystickClose(reg_joysticks[which]);

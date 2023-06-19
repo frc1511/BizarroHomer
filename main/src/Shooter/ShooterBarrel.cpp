@@ -41,7 +41,7 @@ void ShooterBarrel::process() {
   rot_motor.set_percent(pct_out);
 }
 
-void ShooterBarrel::rotate_barrel(RotationDirection dir) {
+void ShooterBarrel::rotate(RotationDirection dir) {
   int pos = static_cast<int>(target_position) + 60 * static_cast<int>(dir);
   
   target_position = static_cast<Position>(pos);

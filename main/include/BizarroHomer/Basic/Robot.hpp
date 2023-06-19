@@ -3,6 +3,7 @@
 #include <BizarroHomer/Basic/Mechanism.hpp>
 #include <BizarroHomer/Drive/Drive.hpp>
 #include <BizarroHomer/Control/Controls.hpp>
+#include <BizarroHomer/Shooter/Shooter.hpp>
 #include <vector>
 
 class Robot {
@@ -15,9 +16,10 @@ public:
   
 private:
   Drive drive;
-  Controls controls { &drive };
+  Shooter shooter;
+  Controls controls { &drive, &shooter };
   
   std::vector<Mechanism*> all_mechanisms {
-    &drive, &controls,
+    &drive, &controls, &shooter
   };
 };

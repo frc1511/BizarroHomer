@@ -1,4 +1,5 @@
 #include <BizarroHomer/Basic/Robot.hpp>
+#include <fmt/core.h>
 
 Robot::Robot() {
 

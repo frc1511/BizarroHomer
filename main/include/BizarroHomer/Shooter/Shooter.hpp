@@ -5,6 +5,7 @@
 #include <BizarroHomer/Shooter/ShooterBarrel.hpp>
 #include <BizarroHomer/Shooter/ShooterPivot.hpp>
 #include <BizarroHomer/Shooter/AirTank.hpp>
+#include <chrono>
 
 class Shooter : public Mechanism {
 public:
@@ -12,14 +13,15 @@ public:
   ~Shooter();
   
   void process() override;
-  
-  void set_pressurizing(bool pressurizing);
-  bool has_pressure();
-  bool is_at_pressure();
-  
-  void rotate_barrel(ShooterBarrel::RotationDirection direction);
+  void send_feedback() override;
   
   void shoot();
+  void pressurize();
+  
+  bool is_at_pressure();
+  bool has_pressure();
+  
+  void rotate_barrel(ShooterBarrel::RotationDirection direction);
   
   void set_preset(ShooterPivot::Preset preset);
   
@@ -29,4 +31,8 @@ private:
   AirTank air_tank;
   ShooterPivot pivot;
   ShooterBarrel barrel;
+  
+  bool should_shoot = false;
+  bool should_pressurize = false;
+  std::chrono::system_clock::time_point shoot_start_time_point;
 };

@@ -23,6 +23,8 @@ public:
   bool is_at_pressure();
   bool has_pressure();
   
+  bool is_shooting();
+  
 private:
   State next_state = State::IDLE;
   

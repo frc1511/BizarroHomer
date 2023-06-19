@@ -16,8 +16,8 @@ public:
   void register_controller(int id);
   
   struct InputFrame {
-    uint16_t buttons;
-    double axes[6];
+    uint16_t buttons = 0;
+    double axes[6] = { 0, 0, 0, 0, 0, 0 };
   };
   
   void get_input(int id, InputFrame* frame);
