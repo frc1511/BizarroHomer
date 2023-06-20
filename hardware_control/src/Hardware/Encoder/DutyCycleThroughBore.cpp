@@ -7,7 +7,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#define TIMEOUT_US 102500
+using namespace std::literals::chrono_literals;
+
+#define TIMEOUT_US 102500us
 #define PULSE_MAX 1025.0
 
 DutyCycleThroughBore::DutyCycleThroughBore(int _channel)
@@ -59,14 +61,26 @@ void DutyCycleThroughBore::read_thread_main() {
       if (should_term) break;
     }
     
+    auto timeout = std::chrono::high_resolution_clock::now();
+    bool timed_out = false;
     while (read_channel() == 0) {
-      // TODO: See if timeout was surpassed...
+      if (std::chrono::high_resolution_clock::now() - timeout > TIMEOUT_US) {
+        timed_out = true;
+        break;
+      }
     }
+    if (timed_out) continue;
+    
     auto start = std::chrono::high_resolution_clock::now();
     
     while (read_channel() == 1) {
-      // TODO: See if timeout was surpassed...
+      if (std::chrono::high_resolution_clock::now() - start > TIMEOUT_US) {
+        timed_out = true;
+        break;
+      }
     }
+    if (timed_out) continue;
+    
     auto end = std::chrono::high_resolution_clock::now();
     
     // Get time high (pulse width).
