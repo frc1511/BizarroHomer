@@ -34,8 +34,7 @@ int main() {
     auto end = std::chrono::high_resolution_clock::now();
     
     // Time left in 20ms loop period.
-    auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    
+    auto dur = end - start;
     if (dur < 20ms) {
       std::this_thread::sleep_for(20ms - dur);
     }

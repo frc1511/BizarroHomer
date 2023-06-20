@@ -2,12 +2,15 @@
 #include <BizarroHomerShared/IPC/IPCReceiver.hpp>
 #include <fmt/core.h>
 
+#define MAX_KEY 20
+#define MAX_VAL 12
+
 struct IPCMessage {
   long mtype;
   struct Data {
-    char key[16];
+    char key[MAX_KEY];
     char key_len;
-    char value[8];
+    char value[MAX_VAL];
     char value_len;
   } data;
 };
@@ -47,8 +50,8 @@ void DataManager::data_thread_main() {
     
     std::lock_guard<std::mutex> lk(data_mutex);
     data.insert_or_assign(
-      std::string(msg.data.key, msg.data.key_len > 16 ? 16 : msg.data.key_len),
-      std::string(msg.data.value, msg.data.value_len > 8 ? 8 : msg.data.value_len)
+      std::string(msg.data.key, msg.data.key_len > MAX_KEY ? MAX_KEY : msg.data.key_len),
+      std::string(msg.data.value, msg.data.value_len > MAX_VAL ? MAX_VAL : msg.data.value_len)
     );
     new_data = true;
   }

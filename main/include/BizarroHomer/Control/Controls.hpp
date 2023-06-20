@@ -24,6 +24,8 @@ private:
     ARCADE = 1,
   };
   DriveMode drive_mode = DriveMode::ARCADE;
+
+  bool was_pressurizing = false;
   
   GameControllerManager::InputFrame input, last_input;
   

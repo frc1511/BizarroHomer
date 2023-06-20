@@ -11,6 +11,7 @@ public:
   ~AirTank();
   
   void process() override;
+  void send_feedback() override;
 
   enum class State {
     IDLE, // Both valves closed.

@@ -18,16 +18,22 @@ void Shooter::process() {
   barrel.process();
   
   AirTank::State desired_state = AirTank::State::IDLE;
-  if (should_shoot) {
+  if (should_shoot && !barrel.is_rotating()) {
+    shooting = true;
+    should_shoot = false;
+    shoot_start_time_point = std::chrono::system_clock::now();
+  }
+  if (shooting) {
     if (std::chrono::system_clock::now() - shoot_start_time_point >= SHOOT_TIME) {
-      should_shoot = false;
+      shooting = false;
       desired_state = AirTank::State::IDLE;
+      barrel.rotate(barrel_dir);
     }
     else {
       desired_state = AirTank::State::SHOOTING;
     }
   }
-  if (should_pressurize && !should_shoot && !is_at_pressure()) {
+  if (should_pressurize && !should_shoot && !shooting && !is_at_pressure()) {
     desired_state = AirTank::State::PRESSURIZING;
     should_pressurize = false;
   }
@@ -43,7 +49,6 @@ void Shooter::send_feedback() {
 
 void Shooter::shoot() {
   should_shoot = true;
-  shoot_start_time_point = std::chrono::system_clock::now();
 }
 
 void Shooter::pressurize() {
@@ -60,6 +65,7 @@ bool Shooter::has_pressure() {
 
 void Shooter::rotate_barrel(ShooterBarrel::RotationDirection dir) {
   barrel.rotate(dir);
+  barrel_dir = dir;
 }
 
 void Shooter::set_preset(ShooterPivot::Preset preset) {

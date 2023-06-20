@@ -13,12 +13,8 @@ Drive::~Drive() {
 }
 
 void Drive::process() {
-  /* drive_left.set_percent(-target_left * 0.3); */
-  /* drive_right.set_percent(target_right * 0.3); */
-  
-  /* talon.set_percent(0.2); */
-  /* fmt::print("talon: {}\n", talon.get_position()); */
-  /* fmt::print("encoder: {}\n", encoder.get_angle()); */
+  drive_left.set_percent(-target_left * 0.3);
+  drive_right.set_percent(target_right * 0.3);
 }
 
 void Drive::tank_control(double left, double right) {
@@ -32,6 +28,4 @@ void Drive::arcade_control(double forwards, double turn) {
   target_right = std::clamp(forwards - turn, -1.0, 1.0);
 }
 
-void Drive::send_feedback() {
-  FeedbackManager::get()->send_value("Drive_Encoder", std::to_string(encoder.get_angle()));
-}
+void Drive::send_feedback() { }

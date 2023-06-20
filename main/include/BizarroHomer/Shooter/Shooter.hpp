@@ -32,7 +32,10 @@ private:
   ShooterPivot pivot;
   ShooterBarrel barrel;
   
+  ShooterBarrel::RotationDirection barrel_dir = ShooterBarrel::RotationDirection::CLOCKWISE;
+  
   bool should_shoot = false;
+  bool shooting = false;
   bool should_pressurize = false;
   std::chrono::system_clock::time_point shoot_start_time_point;
 };

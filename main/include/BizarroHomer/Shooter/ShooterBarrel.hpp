@@ -11,6 +11,7 @@ public:
   ~ShooterBarrel();
   
   void process() override;
+  void send_feedback() override;
   
   enum class RotationDirection {
     CLOCKWISE = +1,

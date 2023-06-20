@@ -120,15 +120,24 @@ void Controls::process() {
     shooter->rotate_barrel(ShooterBarrel::RotationDirection::COUNTER_CLOCKWISE);
   }
   
+  bool is_pressuzizing = false;
+  
   // Pressurizing & Shooting.
   if (BUTTON_DOWN(DualShock4_Button::CROSS)) {
     if (BUTTON_DOWN(DualShock4_Button::LEFT_BUMPER) && !BUTTON_DOWN(DualShock4_Button::RIGHT_BUMPER)) {
       shooter->pressurize();
+      is_pressuzizing = true;
     }
     if (BUTTON_PRESSED(DualShock4_Button::RIGHT_BUMPER) && !BUTTON_DOWN(DualShock4_Button::LEFT_BUMPER)) {
       shooter->shoot();
+      fmt::print(stdout, "Shoot\n");
     }
   }
+  
+  if (is_pressuzizing != was_pressurizing) {
+    fmt::print(stdout, "Pressurizing {}\n", is_pressuzizing ? "started" : "stopped");
+  }
+  was_pressurizing = is_pressuzizing;
 }
 /**
  *

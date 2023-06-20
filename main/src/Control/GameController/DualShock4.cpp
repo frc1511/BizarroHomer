@@ -34,9 +34,7 @@ void DualShock4_LEDManager::send_msg(bool update_ctrl) {
   IPCLEDMessage msg;
   msg.data.update_ctrl = static_cast<uint8_t>(update_ctrl);
   msg.data.colors = colors;
-  fmt::print("sending...\n");
   s.send_msg(msg);
-  fmt::print("sent\n");
 }
 
 DualShock4_LEDManager DualShock4_LEDManager::instance;

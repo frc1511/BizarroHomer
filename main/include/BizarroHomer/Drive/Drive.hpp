@@ -17,11 +17,8 @@ public:
   void arcade_control(double forwards, double turn);
   
 private:
-  /* PWMSparkMax drive_left  { PWM_DRIVE_LEFT }; */
-  /* PWMSparkMax drive_right { PWM_DRIVE_RIGHT }; */
-
-  /* TalonFX talon { 21 }; */
-  DutyCycleThroughBore encoder { 3 };
+  PWMSparkMax drive_left  { PWM_DRIVE_LEFT };
+  PWMSparkMax drive_right { PWM_DRIVE_RIGHT };
   
   double target_left = 0.0, target_right = 0.0;
 };

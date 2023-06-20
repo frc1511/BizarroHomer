@@ -1,4 +1,5 @@
 #include <BizarroHomer/Shooter/ShooterBarrel.hpp>
+#include <BizarroHomer/Basic/FeedbackManager.hpp>
 #include <cmath>
 #include <algorithm>
 
@@ -49,4 +50,10 @@ void ShooterBarrel::rotate(RotationDirection dir) {
 
 bool ShooterBarrel::is_rotating() {
   return !at_position;
+}
+
+void ShooterBarrel::send_feedback() {
+  FeedbackManager::get()->send_value("Barrel_AtPosition", at_position ? "True" : "False");
+  FeedbackManager::get()->send_value("Barrel_Angle", std::to_string(rot_enc.get_angle()));
+  FeedbackManager::get()->send_value("Barrel_TargetAngle", std::to_string(static_cast<int>(target_position)));
 }
