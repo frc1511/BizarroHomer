@@ -34,7 +34,7 @@ public:
   bool is_rotating();
   
 private:
-  TalonFX rot_motor { CAN_SHOOTER_ROTATION };
+  /* TalonFX rot_motor { CAN_SHOOTER_ROTATION }; */
   DutyCycleThroughBore rot_enc { GPIO_SHOOTER_ROTATION_ENCODER };
   
   // Increments of 60 degrees.

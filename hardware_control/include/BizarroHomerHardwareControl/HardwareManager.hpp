@@ -7,6 +7,7 @@
 #include <BizarroHomerHardwareControl/Hardware/DigitalIO/DigitalInput.hpp>
 #include <BizarroHomerHardwareControl/Hardware/DigitalIO/DigitalOutput.hpp>
 #include <BizarroHomerShared/IPC/IPCSender.hpp>
+#include <ctre/phoenix/music/Orchestra.h>
 #include <map>
 #include <memory>
 #include <thread>
@@ -40,6 +41,9 @@ private:
   
   std::map<uint8_t, std::pair<std::unique_ptr<DigitalOutput>, int>> digital_outputs;
   
+  Orchestra orchestra1;
+  Orchestra orchestra2;
+  
   IPCSender s;
   
   std::thread recv_thread;
@@ -50,6 +54,8 @@ private:
   
   bool should_term = false;
   std::mutex manager_mut;
+
+  bool playing_music;
   
   static HardwareManager instance;
 };

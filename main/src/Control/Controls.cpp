@@ -1,6 +1,7 @@
 #include <BizarroHomer/Control/Controls.hpp>
 #include <BizarroHomer/Drive/Drive.hpp>
 #include <BizarroHomer/Shooter/Shooter.hpp>
+#include <BizarroHomer/Hardware/HardwareManager.hpp>
 
 #include <BizarroHomer/Control/GameController/DualShock4.hpp>
 #include <BizarroHomer/Hardware/IOMap.hpp>
@@ -86,6 +87,10 @@ void Controls::process() {
     // Model sine curve.
     return std::sin(axis * M_PI_2);
   };
+  
+  if (BUTTON_PRESSED(DualShock4_Button::PLAYSTATION)) {
+    HardwareManager::get()->start_music();
+  }
   
   // Drive.
   if (drive_mode == DriveMode::ARCADE) {

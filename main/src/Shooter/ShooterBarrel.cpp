@@ -29,7 +29,7 @@ void ShooterBarrel::process() {
   if (std::abs(diff) <= ANGLE_TOLERANCE) {
     // At position, stop rotating.
     at_position = true;
-    rot_motor.set_percent(0.0);
+    /* rot_motor.set_percent(0.0); */
     return;
   }
   
@@ -39,7 +39,7 @@ void ShooterBarrel::process() {
   pct_out = std::clamp(pct_out, -MAX_OUTPUT, +MAX_OUTPUT);
   
   // Rotate!
-  rot_motor.set_percent(pct_out);
+  /* rot_motor.set_percent(pct_out); */
 }
 
 void ShooterBarrel::rotate(RotationDirection dir) {
@@ -56,4 +56,5 @@ void ShooterBarrel::send_feedback() {
   FeedbackManager::get()->send_value("Barrel_AtPosition", at_position ? "True" : "False");
   FeedbackManager::get()->send_value("Barrel_Angle", std::to_string(rot_enc.get_angle()));
   FeedbackManager::get()->send_value("Barrel_TargetAngle", std::to_string(static_cast<int>(target_position)));
+  /* FeedbackManager::get()->send_value("Barrel_Position", std::to_string(rot_motor.get_position())); */
 }

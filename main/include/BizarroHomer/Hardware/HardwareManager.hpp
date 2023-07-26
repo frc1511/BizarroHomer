@@ -39,9 +39,12 @@ public:
     DIGITAL  = 1,
     PERCENT  = 2,
     POSITION = 3,
+    MUSIC    = 4,
   };
   
   void send_ctrl_msg(HardwareType type, uint8_t id, ControlProperty prop, double value);
+  
+  void start_music();
   
   enum class StatusProperty : uint8_t {
     ENCODER = 0,

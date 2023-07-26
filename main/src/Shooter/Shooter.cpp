@@ -18,6 +18,7 @@ void Shooter::process() {
   barrel.process();
   
   AirTank::State desired_state = AirTank::State::IDLE;
+  // TODO: Make sure barrel is at correct rotation for at least 0.5 seconds before shooting - weed out any bad data. Also, Also move from moving average to single pole iir.
   if (should_shoot && !barrel.is_rotating()) {
     shooting = true;
     should_shoot = false;

@@ -2,6 +2,7 @@
 
 #include <BizarroHomer/Basic/Mechanism.hpp>
 #include <BizarroHomer/Hardware/MotorControl/PWMSparkMax.hpp>
+#include <BizarroHomer/Hardware/MotorControl/TalonFX.hpp>
 #include <BizarroHomer/Hardware/IOMap.hpp>
 #include <BizarroHomer/Hardware/Encoder/DutyCycleThroughBore.hpp>
 

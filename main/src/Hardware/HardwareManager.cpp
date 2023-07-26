@@ -76,6 +76,10 @@ void HardwareManager::send_ctrl_msg(HardwareType type, uint8_t id, ControlProper
   s.send_msg(msg);
 }
 
+void HardwareManager::start_music() {
+  send_ctrl_msg(HardwareType::CAN_TALON_FX, 0, ControlProperty::MUSIC, 0.0);
+}
+
 void HardwareManager::register_status_callback(HardwareType type, uint8_t id, StatusProperty prop, StatusCallbackFunc callback) {
   std::lock_guard<std::mutex> lk(status_mutex);
   status_callbacks.emplace_back(StatusCallbackID { type, id, prop }, callback);

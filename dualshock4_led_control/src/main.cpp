@@ -31,12 +31,14 @@ int main() {
   fmt::print(stdout, "DS4 LED Control Service starting at {}\n", std::ctime(&start_time));
   fmt::print(stderr, "DS4 LED Control Service starting at {}\n", std::ctime(&start_time));
   
+  /*
   signal(SIGHUP,  sig_handler);
   signal(SIGINT,  sig_handler);
   signal(SIGQUIT, sig_handler);
   signal(SIGILL,  sig_handler);
   signal(SIGTRAP, sig_handler);
   signal(SIGABRT, sig_handler);
+  */
   
   IPCReceiver r(IPC_PATHNAME, 'D');
   

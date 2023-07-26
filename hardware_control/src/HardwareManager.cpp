@@ -4,6 +4,8 @@
 #include <ctre/phoenix/cci/PDP_CCI.h>
 #include <fmt/core.h>
 
+#define MUSIC 0
+
 enum ControlMessageType {
   MSG_CONTROL = 1,
   MSG_ENABLE = 2,
@@ -36,6 +38,7 @@ enum ControlProperty {
   CPROP_DIG = 1,
   CPROP_PCT = 2,
   CPROP_POS = 3,
+  CPROP_MUSIC = 4,
 };
 
 struct IPCStatusMessage {
@@ -71,7 +74,7 @@ void HardwareManager::send_status_msgs() {
   msg.data.hardware_prop = SPROP_ENC;
   for (const auto& [id, t] : talon_fxs) {
     msg.data.hardware_id = id;
-    msg.data.value = t->GetSelectedSensorPosition(0);
+    msg.data.value = (t->GetSelectedSensorPosition(0) / 2056.0);
     s.send_msg(msg);
   }
   // Encoders.
@@ -114,6 +117,26 @@ void HardwareManager::process_hardware() {
   }
   else {
     // TODO: Disable GPIO pin outputs?
+  }
+  
+  if (playing_music) {
+    // Starting from the beginning.
+    if (!orchestra1.IsPlaying()) {
+      /* orchestra1.LoadMusic("home_depot_beat_high.chrp"); */
+      /* orchestra2.LoadMusic("home_depot_beat_low_higher.chrp"); */
+      orchestra1.LoadMusic("Thunderstruck.chrp");//"home_depot_beat_high.chrp");
+      orchestra2.LoadMusic("Thunderstruck.chrp");//"home_depot_beat_low_higher.chrp");
+      
+      orchestra1.Play();
+      orchestra2.Play();
+    }
+    // Finished the song.
+    if (orchestra1.GetCurrentTime() > 30000) {
+      playing_music = false;
+      
+      orchestra1.Stop();
+      orchestra2.Stop();
+    }
   }
 }
 
@@ -183,7 +206,7 @@ void HardwareManager::recv_thread_main() {
     }
     
     // Init hardware.
-    const auto& [c, t, id, p, v] = msg.data;
+    auto [c, t, id, p, v] = msg.data;
     if (p == CPROP_INIT) {
       std::lock_guard<std::mutex> lk(hardware_mut);
       switch (t) {
@@ -206,7 +229,21 @@ void HardwareManager::recv_thread_main() {
             auto& t = (talon_fxs[id] = std::make_unique<TalonFX>(id));
             fmt::print("Intialized CAN TalonFX at CAN ID: {}\n", id);
             // Set to stopped.
+            TalonFXConfiguration configs;
+            t->GetAllConfigs(configs);
+            configs.primaryPID.selectedFeedbackSensor = FeedbackDevice::IntegratedSensor;
+            t->ConfigAllSettings(configs);
+            t->SetSelectedSensorPosition(0);
             t->Set(TalonFXControlMode::PercentOutput, 0.0);
+            
+            // Add orchestra instrument!
+            auto talon_fx_num = talon_fxs.size();
+            if (talon_fx_num == 2) {
+              orchestra2.AddInstrument(*t);
+            }
+            else {
+              orchestra1.AddInstrument(*t);
+            }
           }
           break;
         case HTYPE_PWM_SPARK_MAX:
@@ -222,6 +259,19 @@ void HardwareManager::recv_thread_main() {
           fmt::print("Intialized Through Bore Encoder at channel: {}\n", id);
           break;
       }
+      continue;
+    }
+    else if (p == CPROP_MUSIC) {
+      // TODO: Check v for which song to play... right now it's just Home Depot Beat!
+      
+      std::lock_guard<std::mutex> lk(hardware_mut);
+      playing_music = true;
+      
+      // Stop all Falcons from moving since they need to play music.
+      for (auto& [id, talon_fx] : talon_fxs) {
+        talon_fxs.at(id)->Set(TalonFXControlMode::PercentOutput, 0.0);
+      }
+      
       continue;
     }
     
@@ -258,6 +308,13 @@ void HardwareManager::recv_thread_main() {
         break;
       case HTYPE_CAN_TALON_FX:
         if (!check_init(talon_fxs)) break;
+        
+        // Don't move the motors when playing music!
+        if (playing_music) {
+          p = CPROP_PCT;
+          v = 0.0;
+        }
+        
         if (p == CPROP_PCT) {
           talon_fxs.at(id)->Set(TalonFXControlMode::PercentOutput, v);
         }

@@ -11,6 +11,7 @@ public:
   ~ShooterPivot();
   
   void process() override;
+  void send_feedback() override;
   
   enum class Preset {
     LOW,
@@ -30,7 +31,7 @@ private:
   
   const std::map<Preset, double> preset_positions {
     { Preset::LOW,  0.0 },
-    { Preset::MID,  10.0 },
-    { Preset::HIGH, 20.0 },
+    { Preset::MID,  1.2 },
+    { Preset::HIGH, 2.4 }, // MAX 2.8
   };
 };
