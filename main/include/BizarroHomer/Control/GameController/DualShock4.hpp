@@ -2,6 +2,8 @@
 
 #include <BizarroHomerShared/IPC/IPCSender.hpp>
 #include <BizarroHomer/Util/Color.hpp>
+#include <filesystem>
+#include <vector>
 #include <cstdint>
 #include <mutex>
 
@@ -70,5 +72,26 @@ private:
   std::mutex led_mutex;
   
   static DualShock4_LEDManager instance;
+};
+
+class DualShock4_BatteryManager {
+public:
+  static inline DualShock4_BatteryManager* get() {
+    return &instance;
+  }
+  
+  DualShock4_BatteryManager(DualShock4_BatteryManager const&) = delete;
+  DualShock4_BatteryManager& operator=(DualShock4_BatteryManager const&) = delete;
+  
+  double get_percentage();
+  void rescan_controllers();
+  
+private:
+  DualShock4_BatteryManager();
+  ~DualShock4_BatteryManager();
+
+  std::vector<std::filesystem::path> ctrl_paths;
+  
+  static DualShock4_BatteryManager instance;
 };
 

@@ -47,20 +47,19 @@ void Controls::process() {
 
   if (!was_conn) {
     DualShock4_LEDManager::get()->update_controllers();
+    DualShock4_BatteryManager::get()->rescan_controllers();
   }
   
   colors = 0;
   
+  // Robot battery low.
   if (pdp->get_voltage() < 12.0) {
     colors |= DualShock4_LEDManager::ColorBits::RED;
   }
-  
-  /*
-  if (controller_voltage < 20) {
-    // yellow
+  // Controller battery low.
+  if (DualShock4_BatteryManager::get()->get_percentage() <= 0.2) {
+    colors |= DualShock4_LEDManager::ColorBits::YELLOW;
   }
-  */
-  
   // Warn about shooter pressure.
   if (shooter->is_at_pressure()) {
     colors |= DualShock4_LEDManager::ColorBits::ORANGE;
