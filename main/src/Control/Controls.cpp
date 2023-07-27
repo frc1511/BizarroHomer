@@ -93,6 +93,12 @@ void Controls::process() {
     HardwareManager::get()->start_music();
   }
   
+  // Toggle drive mode.
+  if (BUTTON_PRESSED(DualShock4_Button::TRIANGLE)) {
+    drive_mode = (drive_mode == DriveMode::ARCADE) ? DriveMode::TANK : DriveMode::ARCADE;
+    fmt::print("Drive mode {}\n", drive_mode == DriveMode::TANK ? "TANK" : "ARCADE");
+  }
+  
   // Drive.
   if (drive_mode == DriveMode::ARCADE) {
     double forwards = -improve_axis(input.axes[DualShock4_Axis::LEFT_Y]);
@@ -108,22 +114,27 @@ void Controls::process() {
   }
   
   // Pivot presets.
-  if (BUTTON_PRESSED(DualShock4_Button::TRIANGLE)) {
+  if (BUTTON_PRESSED(DualShock4_Button::DPAD_UP)) {
     shooter->set_preset(ShooterPivot::Preset::HIGH);
+    fmt::print("Preset HIGH\n");
   }
-  if (BUTTON_PRESSED(DualShock4_Button::SQUARE)) {
+  if (BUTTON_PRESSED(DualShock4_Button::DPAD_RIGHT)) {
     shooter->set_preset(ShooterPivot::Preset::MID);
+    fmt::print("Preset MID\n");
   }
-  if (BUTTON_PRESSED(DualShock4_Button::CIRCLE)) {
+  if (BUTTON_PRESSED(DualShock4_Button::DPAD_DOWN)) {
     shooter->set_preset(ShooterPivot::Preset::LOW);
+    fmt::print("Preset LOW\n");
   }
   
   // Barrel rotation.
   if (BUTTON_PRESSED(DualShock4_Button::SHARE)) {
     shooter->rotate_barrel(ShooterBarrel::RotationDirection::CLOCKWISE);
+    fmt::print("Barrel CLOCKWISE\n");
   }
   if (BUTTON_PRESSED(DualShock4_Button::OPTIONS)) {
     shooter->rotate_barrel(ShooterBarrel::RotationDirection::COUNTER_CLOCKWISE);
+    fmt::print("Barrel COUNTER CLOCKWISE\n");
   }
   
   bool is_pressuzizing = false;
@@ -141,14 +152,7 @@ void Controls::process() {
   }
   
   if (is_pressuzizing != was_pressurizing) {
-    fmt::print(stdout, "Pressurizing {}\n", is_pressuzizing ? "started" : "stopped");
+    fmt::print(stdout, "Pressurizing {}\n", is_pressuzizing ? "START" : "STOP");
   }
   was_pressurizing = is_pressuzizing;
 }
-/**
- *
- *
-    // Toggle drive mode.
-    drive_mode = (drive_mode == DriveMode::ARCADE) ? DriveMode::TANK : DriveMode::ARCADE;
- *
- */

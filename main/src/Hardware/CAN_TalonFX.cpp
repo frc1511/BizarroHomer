@@ -9,7 +9,7 @@ CAN_TalonFX::CAN_TalonFX(int _can_id)
   HardwareManager::get()->send_ctrl_msg(HARDWARE_TYPE, can_id, HardwareManager::ControlProperty::INIT, 0.0);
   
   // Register status callback.
-  HardwareManager::get()->register_status_callback(HARDWARE_TYPE, can_id, HardwareManager::StatusProperty::VALUE, [&](double v) {
+  HardwareManager::get()->register_status_callback(HARDWARE_TYPE, can_id, HardwareManager::StatusProperty::ENCODER, [&](double v) {
     std::lock_guard<std::mutex> lk(pos_mut);
     pos = v;
   });

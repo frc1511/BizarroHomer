@@ -48,6 +48,9 @@ public:
   
   enum class StatusProperty : uint8_t {
     VALUE = 0,
+    ENCODER = 1,
+    CURRENT = 2,
+    VELOCITY = 3,
   };
   
   using StatusCallbackFunc = std::function<void(double value)>;

@@ -16,13 +16,15 @@ public:
     SQUARE        = 1 << 3,
     LEFT_BUMPER   = 1 << 4,
     RIGHT_BUMPER  = 1 << 5,
-    LEFT_TRIGGER  = 1 << 6,
-    RIGHT_TRIGGER = 1 << 7,
-    SHARE         = 1 << 8,
-    OPTIONS       = 1 << 9,
-    PLAYSTATION   = 1 << 10,
-    LEFT_STICK    = 1 << 11,
-    RIGHT_STICK   = 1 << 12,
+    SHARE         = 1 << 6,
+    OPTIONS       = 1 << 7,
+    PLAYSTATION   = 1 << 8,
+    LEFT_STICK    = 1 << 9,
+    RIGHT_STICK   = 1 << 10,
+    DPAD_LEFT     = 1 << 11,
+    DPAD_RIGHT    = 1 << 12,
+    DPAD_UP       = 1 << 13,
+    DPAD_DOWN     = 1 << 14,
   };
 };
 
