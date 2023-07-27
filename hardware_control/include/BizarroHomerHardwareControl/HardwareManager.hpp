@@ -32,17 +32,57 @@ private:
   HardwareManager();
   ~HardwareManager();
   
+  struct IPCControlMessage {
+    long mtype = 1;
+    struct Data {
+      uint8_t control_type;
+      uint8_t hardware_type;
+      uint8_t hardware_id;
+      uint8_t hardware_prop;
+      double value;
+    } data;
+  };
+  
+  enum ControlMessageType {
+    MSG_CONTROL = 1,
+    MSG_ENABLE  = 2,
+    MSG_DISABLE = 3,
+    MSG_RESET   = 4,
+  };
+  
+  enum HardwareType {
+    HTYPE_DIG_IN           = 0,
+    HTYPE_DIG_OUT          = 1,
+    HTYPE_CAN_TALON_FX     = 2,
+    HTYPE_PWM_SPARK_MAX    = 3,
+    HTYPE_ABS_THROUGH_BORE = 4,
+    HTYPE_CAN_PDP          = 5,
+  };
+  
+  enum ControlProperty {
+    CPROP_INIT  = 0,
+    CPROP_DIG   = 1,
+    CPROP_PCT   = 2,
+    CPROP_POS   = 3,
+    CPROP_MUSIC = 4,
+  };
+  
+  void handle_control_msg(IPCControlMessage& msg);
+  void init_hardware(HardwareType type, uint8_t id, double value);
+  void start_music(double value);
+  void control_hardware(ControlProperty prop, HardwareType type, uint8_t id, double value);
+  
   void stop();
   
   std::map<uint8_t, std::unique_ptr<PWMSparkMax>> spark_maxes;
   std::map<uint8_t, std::unique_ptr<TalonFX>> talon_fxs;
   std::map<uint8_t, std::unique_ptr<DutyCycleThroughBore>> through_bores;
   std::map<uint8_t, std::unique_ptr<DigitalInput>> digital_inputs;
-  
   std::map<uint8_t, std::pair<std::unique_ptr<DigitalOutput>, int>> digital_outputs;
+  int pdp_can_id = -1;
   
-  Orchestra orchestra1;
-  Orchestra orchestra2;
+  Orchestra orchestra_primary;
+  Orchestra orchestra_secondary;
   
   IPCSender s;
   
@@ -55,7 +95,8 @@ private:
   bool should_term = false;
   std::mutex manager_mut;
 
-  bool playing_music;
+  bool playing_music = false;
+  uint8_t which_song = 0;
   
   static HardwareManager instance;
 };
