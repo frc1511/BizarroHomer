@@ -2,10 +2,10 @@
 
 #include <optional>
 
-class DigitalOutput {
+class Digital_Output {
 public:
-  DigitalOutput(int channel, std::optional<bool> default_set = std::nullopt);
-  ~DigitalOutput();
+  Digital_Output(int channel, std::optional<bool> default_set = std::nullopt);
+  ~Digital_Output();
   
   void set(bool output);
   bool get();

@@ -20,8 +20,8 @@
 #define BUTTON_RELEASED(b) \
   !static_cast<bool>(input.buttons & b) && static_cast<bool>(last_input.buttons & b)
 
-Controls::Controls(Drive* _drive, Shooter* _shooter)
-: drive(_drive), shooter(_shooter) {
+Controls::Controls(Drive* _drive, Shooter* _shooter, CAN_PDP* _pdp)
+: drive(_drive), shooter(_shooter), pdp(_pdp) {
   
   // Register game controller.
   GameControllerManager::get()->register_controller(GC_DRIVER);
@@ -50,11 +50,13 @@ void Controls::process() {
   }
   
   colors = 0;
-  /*
-  if (pdp_voltage < 11.8) {
-    // red
+  
+  if (pdp->get_voltage() < 12.0) {
+    colors |= DualShock4_LEDManager::ColorBits::RED;
   }
-  if (controller_voltage < 40) {
+  
+  /*
+  if (controller_voltage < 20) {
     // yellow
   }
   */

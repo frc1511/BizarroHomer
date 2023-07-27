@@ -2,10 +2,10 @@
 
 #include <mutex>
 
-class DigitalInput {
+class Digital_Input {
 public:
-  DigitalInput(int channel);
-  ~DigitalInput();
+  Digital_Input(int channel);
+  ~Digital_Input();
   
   bool get();
   

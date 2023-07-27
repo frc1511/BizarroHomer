@@ -15,10 +15,7 @@ struct IPCStatusMessage {
 };
 
 enum StatusProperty {
-  SPROP_ENC = 0,
-  SPROP_DIG = 1,
-  SPROP_ANG = 2,
-  SPROP_VAL = 3,
+  SPROP_VAL = 0,
 };
 
 HardwareManager::HardwareManager()
@@ -34,7 +31,7 @@ void HardwareManager::send_status_msgs() {
   msg.mtype = 1;
   // TalonFXs.
   msg.data.hardware_type = HTYPE_CAN_TALON_FX;
-  msg.data.hardware_prop = SPROP_ENC;
+  msg.data.hardware_prop = SPROP_VAL;
   for (const auto& [id, t] : talon_fxs) {
     msg.data.hardware_id = id;
     
@@ -46,7 +43,7 @@ void HardwareManager::send_status_msgs() {
   }
   // Encoders.
   msg.data.hardware_type = HTYPE_ABS_THROUGH_BORE;
-  msg.data.hardware_prop = SPROP_ANG;
+  msg.data.hardware_prop = SPROP_VAL;
   for (const auto& [id, through_bore] : through_bores) {
     msg.data.hardware_id = id;
     msg.data.value = through_bore->get_angle();
@@ -54,7 +51,7 @@ void HardwareManager::send_status_msgs() {
   }
   // Digital Inputs.
   msg.data.hardware_type = HTYPE_DIG_IN;
-  msg.data.hardware_prop = SPROP_DIG;
+  msg.data.hardware_prop = SPROP_VAL;
   for (const auto& [id, input] : digital_inputs) {
     msg.data.hardware_id = id;
     msg.data.value = static_cast<double>(input->get());

@@ -1,9 +1,9 @@
 #pragma once
 
-class PWMSparkMax {
+class PWM_SparkMax {
 public:
-  PWMSparkMax(int channel);
-  ~PWMSparkMax();
+  PWM_SparkMax(int channel);
+  ~PWM_SparkMax();
   
   virtual void set_percent(double percent);
   

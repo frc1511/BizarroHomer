@@ -2,10 +2,10 @@
 
 #include <mutex>
 
-class DutyCycleThroughBore {
+class DutyCycle_ThroughBore {
 public:
-  DutyCycleThroughBore(int channel);
-  ~DutyCycleThroughBore();
+  DutyCycle_ThroughBore(int channel);
+  ~DutyCycle_ThroughBore();
   
   double get_angle();
   

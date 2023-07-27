@@ -1,5 +1,6 @@
 #pragma once
 
+#include <BizarroHomer/Hardware/CAN_PDP.hpp>
 #include <BizarroHomer/Basic/Mechanism.hpp>
 #include <BizarroHomer/Control/GameController/GameControllerManager.hpp>
 
@@ -8,7 +9,7 @@ class Shooter;
 
 class Controls : public Mechanism {
 public:
-  Controls(Drive* drive, Shooter* shooter);
+  Controls(Drive* drive, Shooter* shooter, CAN_PDP* pdp);
   ~Controls();
   
   void process() override;
@@ -16,6 +17,7 @@ public:
 private:
   Drive* drive;
   Shooter* shooter;
+  CAN_PDP* pdp;
   
   bool was_conn = false;
   

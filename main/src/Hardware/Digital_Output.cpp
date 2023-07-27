@@ -1,9 +1,9 @@
-#include <BizarroHomer/Hardware/DigitalIO/DigitalOutput.hpp>
+#include <BizarroHomer/Hardware/Digital_Output.hpp>
 #include <BizarroHomer/Hardware/HardwareManager.hpp>
 
 #define HARDWARE_TYPE HardwareManager::HardwareType::DIGITAL_OUT
 
-DigitalOutput::DigitalOutput(int _channel, std::optional<bool> default_set)
+Digital_Output::Digital_Output(int _channel, std::optional<bool> default_set)
 : channel(_channel) {
   // Init.
   HardwareManager::get()->send_ctrl_msg(HARDWARE_TYPE, channel, HardwareManager::ControlProperty::INIT, default_set ? (*default_set + 1) : 0);
@@ -12,13 +12,13 @@ DigitalOutput::DigitalOutput(int _channel, std::optional<bool> default_set)
   }
 }
 
-DigitalOutput::~DigitalOutput() { }
+Digital_Output::~Digital_Output() { }
 
-void DigitalOutput::set(bool _output) {
+void Digital_Output::set(bool _output) {
   output = _output;
   HardwareManager::get()->send_ctrl_msg(HARDWARE_TYPE, channel, HardwareManager::ControlProperty::DIGITAL, output);
 }
 
-bool DigitalOutput::get() {
+bool Digital_Output::get() {
   return output;
 }

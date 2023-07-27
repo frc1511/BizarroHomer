@@ -26,7 +26,7 @@ void AirTank::process() {
     return closed_time >= 500ms;
   };
   
-  auto close_valve = [](DigitalOutput* valve, std::chrono::steady_clock::time_point* close_time_point) {
+  auto close_valve = [](Digital_Output* valve, std::chrono::steady_clock::time_point* close_time_point) {
     if (valve->get() == VALVE_OPEN) {
       (*close_time_point) = std::chrono::steady_clock::now();
     }

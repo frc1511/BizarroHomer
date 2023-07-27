@@ -2,10 +2,10 @@
 
 #include <mutex>
 
-class TalonFX {
+class CAN_TalonFX {
 public:
-  TalonFX(int can_id);
-  ~TalonFX();
+  CAN_TalonFX(int can_id);
+  ~CAN_TalonFX();
   
   virtual void set_percent(double percent);
   virtual void set_position(double position);

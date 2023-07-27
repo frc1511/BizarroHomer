@@ -47,10 +47,7 @@ public:
   void start_music();
   
   enum class StatusProperty : uint8_t {
-    ENCODER = 0,
-    DIGITAL = 1,
-    ANGLE   = 2,
-    VALUE   = 3,
+    VALUE = 0,
   };
   
   using StatusCallbackFunc = std::function<void(double value)>;
