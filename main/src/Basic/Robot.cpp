@@ -2,13 +2,9 @@
 #include <BizarroHomer/Hardware/HardwareManager.hpp>
 #include <fmt/core.h>
 
-Robot::Robot() {
+Robot::Robot() { }
 
-}
-
-Robot::~Robot() {
-
-}
+Robot::~Robot() { }
 
 void Robot::process() {
   thunder::HardwareManager::get()->process_orchestra();

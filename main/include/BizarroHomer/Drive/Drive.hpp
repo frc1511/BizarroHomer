@@ -18,8 +18,9 @@ public:
   void arcade_control(double forwards, double turn);
   
 private:
-  thunder::SparkMax drive_left  { PWM_DRIVE_LEFT };
-  thunder::SparkMax drive_right { PWM_DRIVE_RIGHT };
+  thunder::SparkMax m_drive_left  { PWM_DRIVE_LEFT };
+  thunder::SparkMax m_drive_right { PWM_DRIVE_RIGHT };
   
-  double target_left = 0.0, target_right = 0.0;
+  double m_target_left = 0.0,
+         m_target_right = 0.0;
 };

@@ -18,5 +18,5 @@ public:
   std::string string();
   
 private:
-  std::string response;
+  std::string m_response;
 };

@@ -11,27 +11,39 @@ thunder::PWMMotorController::PWMMotorController(int channel, int max, int max_de
   int period = 1e9 / freq;
   m_pwm.set_period(period);
   
-  // Set neutral.
-  set(0.0);
-  
   // Enable PWM.
   m_pwm.set_enabled(true);
+  
+  stop();
   
   HardwareManager::get()->register_hardware(this);
 }
 
-void thunder::PWMMotorController::set(double percent) {
-  percent = std::clamp(percent, -1.0, 1.0);
-  
-  int dc = m_center;
-  
-  if (percent >= PERCENT_TOLERANCE) {
-    dc = m_max_deadband + static_cast<int>(percent * (m_max - m_max_deadband));
-  }
-  else if (percent <= -PERCENT_TOLERANCE) {
-    dc = m_min_deadband - static_cast<int>(percent * -1.0 * (m_min_deadband - m_min));
-  }
-  
-  m_pwm.set_duty_cycle(dc);
+void thunder::PWMMotorController::stop() {
+  set(0.0);
 }
 
+void thunder::PWMMotorController::set_enabled(bool enabled) {
+  m_enabled = enabled;
+  stop();
+}
+
+void thunder::PWMMotorController::set(double percent) {
+  if (!m_enabled) {
+    stop();
+    return;
+  }
+  
+  percent = std::clamp(percent, -1.0, 1.0);
+  
+  int duty_cycle = m_center;
+  
+  if (percent >= PERCENT_TOLERANCE) {
+    duty_cycle = m_max_deadband + static_cast<int>(percent * (m_max - m_max_deadband));
+  }
+  else if (percent <= -PERCENT_TOLERANCE) {
+    duty_cycle = m_min_deadband - static_cast<int>(percent * -1.0 * (m_min_deadband - m_min));
+  }
+  
+  m_pwm.set_duty_cycle(duty_cycle);
+}

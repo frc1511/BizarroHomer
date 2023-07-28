@@ -1,20 +1,18 @@
 #include <BizarroHomer/Shooter/AirTank.hpp>
 #include <BizarroHomer/Basic/FeedbackManager.hpp>
 
-#define VALVE_CLOSED 1
+#define VALVE_CLOSED 0
 #define VALVE_OPEN (!VALVE_CLOSED)
 
 AirTank::AirTank()
-: fill_valve(GPIO_FILL_VALVE, VALVE_CLOSED),
-  shoot_valve(GPIO_SHOOT_VALVE, VALVE_CLOSED) {
+: m_fill_valve(GPIO_FILL_VALVE, VALVE_CLOSED),
+  m_shoot_valve(GPIO_SHOOT_VALVE, VALVE_CLOSED) {
   
-  fill_close_time_point = std::chrono::steady_clock::now();
-  shoot_close_time_point = std::chrono::steady_clock::now();
+  m_fill_close_time_point = std::chrono::steady_clock::now();
+  m_shoot_close_time_point = std::chrono::steady_clock::now();
 }
 
-AirTank::~AirTank() {
-
-}
+AirTank::~AirTank() = default;
 
 void AirTank::process() {
   using namespace std::literals::chrono_literals;
@@ -33,32 +31,32 @@ void AirTank::process() {
     valve->set(VALVE_CLOSED);
   };
   
-  switch (next_state) {
+  switch (m_next_state) {
     case State::IDLE:
       // Close both valves.
-      close_valve(&fill_valve, &fill_close_time_point);
-      close_valve(&shoot_valve, &shoot_close_time_point);
+      close_valve(&m_fill_valve, &m_fill_close_time_point);
+      close_valve(&m_shoot_valve, &m_shoot_close_time_point);
       break;
     case State::PRESSURIZING:
       // Close the shoot valve.
-      close_valve(&shoot_valve, &shoot_close_time_point);
+      close_valve(&m_shoot_valve, &m_shoot_close_time_point);
       // Don't open fill valve if at pressure. Also, wait 0.5 seconds after closing the shoot valve to open the fill valve.
-      if (is_at_pressure() || !safe_to_open_valve(shoot_close_time_point)) {
-        close_valve(&fill_valve, &fill_close_time_point);
+      if (is_at_pressure() || !safe_to_open_valve(m_shoot_close_time_point)) {
+        close_valve(&m_fill_valve, &m_fill_close_time_point);
       }
       else {
-        fill_valve.set(VALVE_OPEN);
+        m_fill_valve.set(VALVE_OPEN);
       }
       break;
     case State::SHOOTING:
       // Close the fill valve.
-      close_valve(&fill_valve, &fill_close_time_point);
+      close_valve(&m_fill_valve, &m_fill_close_time_point);
       // Wait 0.5 seconds after closing the fill valve to open the shoot valve.
-      if (safe_to_open_valve(fill_close_time_point)) {
-        shoot_valve.set(VALVE_OPEN);
+      if (safe_to_open_valve(m_fill_close_time_point)) {
+        m_shoot_valve.set(VALVE_OPEN);
       }
       else {
-        close_valve(&shoot_valve, &shoot_close_time_point);
+        close_valve(&m_shoot_valve, &m_shoot_close_time_point);
       }
       break;
   }
@@ -66,10 +64,10 @@ void AirTank::process() {
 
 void AirTank::set_state(State state) {
   if (state == State::PRESSURIZING && is_at_pressure()) {
-    next_state = State::IDLE;
+    m_next_state = State::IDLE;
   }
   else {
-    next_state = state;
+    m_next_state = state;
   }
 }
 
@@ -84,12 +82,12 @@ bool AirTank::has_pressure() {
 }
 
 bool AirTank::is_shooting() {
-  return fill_valve.get();
+  return m_fill_valve.get();
 }
 
 void AirTank::send_feedback() {
   std::string state_str;
-  switch (next_state) {
+  switch (m_next_state) {
     case State::IDLE:
       state_str = "Idle";
       break;
@@ -103,8 +101,8 @@ void AirTank::send_feedback() {
   
   FeedbackManager::get()->send_value("AirTank_NextState", state_str);
 
-  bool _fill = fill_valve.get();
-  bool _shoot = shoot_valve.get();
+  bool _fill = m_fill_valve.get();
+  bool _shoot = m_shoot_valve.get();
   
   state_str = "Idle";
   if (_fill == VALVE_OPEN && _shoot == VALVE_CLOSED) {

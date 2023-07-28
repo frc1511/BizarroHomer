@@ -11,16 +11,16 @@ std::map<HTTPResponse::Status, std::string> status_str_map {
 };
 
 HTTPResponse::HTTPResponse(Status status, void* content, std::size_t content_size) {
-  response = fmt::format("HTTP/1.1 {}\n", status_str_map.at(status));
-  response += "Connection: keep-alive\n";
-  response += "Server: Bizarro Homer Dashboard Server\n";
-  response += fmt::format("Content-Length: {}\n", content_size);
-  response += '\n';
+  m_response = fmt::format("HTTP/1.1 {}\n", status_str_map.at(status));
+  m_response += "Connection: keep-alive\n";
+  m_response += "Server: Bizarro Homer Dashboard Server\n";
+  m_response += fmt::format("Content-Length: {}\n", content_size);
+  m_response += '\n';
   if (content_size) {
-    response += std::string((char*)content, content_size);
+    m_response += std::string((char*)content, content_size);
   }
 }
   
 std::string HTTPResponse::string() {
-  return response;
+  return m_response;
 }

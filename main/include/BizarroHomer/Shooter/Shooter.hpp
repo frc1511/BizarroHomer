@@ -28,14 +28,14 @@ public:
   ShooterPivot::Preset get_preset();
   
 private:
-  AirTank air_tank;
-  ShooterPivot pivot;
-  ShooterBarrel barrel;
+  AirTank m_air_tank;
+  ShooterPivot m_pivot;
+  ShooterBarrel m_barrel;
   
-  ShooterBarrel::RotationDirection barrel_dir = ShooterBarrel::RotationDirection::CLOCKWISE;
+  ShooterBarrel::RotationDirection m_barrel_dir = ShooterBarrel::RotationDirection::CLOCKWISE;
   
-  bool should_shoot = false;
-  bool shooting = false;
-  bool should_pressurize = false;
-  std::chrono::system_clock::time_point shoot_start_time_point;
+  bool m_should_shoot = false;
+  bool m_shooting = false;
+  bool m_should_pressurize = false;
+  std::chrono::system_clock::time_point m_shoot_start_time_point;
 };

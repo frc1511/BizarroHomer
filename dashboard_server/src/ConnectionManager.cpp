@@ -7,9 +7,11 @@
 #include <filesystem>
 #include <chrono>
 
+#define SERVER_PATH "/var/frc1511/BizarroHomer/dashboard/"
+
 ConnectionManager::ConnectionManager(std::size_t thread_num) {
   for (std::size_t i = 0; i < thread_num; i++) {
-    workers.emplace_back([this]() {
+    m_workers.emplace_back([this]() {
       this->worker_thread();
     });
   }
@@ -17,27 +19,27 @@ ConnectionManager::ConnectionManager(std::size_t thread_num) {
 
 ConnectionManager::~ConnectionManager() {
   {
-    std::lock_guard<std::mutex> lk(queue_mut);
-    conn_tasks = decltype(conn_tasks)();
-    should_term = true;
+    std::lock_guard<std::mutex> lk(m_queue_mutex);
+    m_connection_tasks = std::queue<Task>();
+    m_should_term = true;
   }
-  condition.notify_all();
+  m_condition.notify_all();
   
-  for (std::thread& worker : workers) {
+  for (std::thread& worker : m_workers) {
     worker.join();
   }
 }
 
 void ConnectionManager::handle_new_connection(int client_fd) {
   {
-    std::lock_guard<std::mutex> lk(queue_mut);
+    std::lock_guard<std::mutex> lk(m_queue_mutex);
     ConnectionHandlerFunction func = [this](int client_fd, bool* _should_term) {
       this->handle_connection(client_fd, _should_term);
     };
     // emplace() is being stupid so this'll have to do.
-    conn_tasks.push(Task{func, client_fd});
+    m_connection_tasks.push(Task{func, client_fd});
   }
-  condition.notify_one();
+  m_condition.notify_one();
 }
 
 void ConnectionManager::worker_thread() {
@@ -45,20 +47,18 @@ void ConnectionManager::worker_thread() {
     Task task;
     
     {
-      std::unique_lock<std::mutex> lk(queue_mut);
-      condition.wait(lk, [this] { return should_term || !conn_tasks.empty(); });
+      std::unique_lock<std::mutex> lk(m_queue_mutex);
+      m_condition.wait(lk, [this] { return m_should_term || !m_connection_tasks.empty(); });
       
-      if (should_term) break;
+      if (m_should_term) break;
       
-      task = std::move(conn_tasks.front());
-      conn_tasks.pop();
+      task = std::move(m_connection_tasks.front());
+      m_connection_tasks.pop();
     }
     
-    task.func(task.client_fd, &should_term);
+    task.func(task.client_fd, &m_should_term);
   }
 }
-
-#define SERVER_PATH std::filesystem::path("/var/frc1511/BizarroHomer/dashboard/")
 
 void ConnectionManager::handle_connection(int client_fd, bool* should_term) {
   using namespace std::literals::chrono_literals;
@@ -149,7 +149,7 @@ void ConnectionManager::handle_connection(int client_fd, bool* should_term) {
 }
 
 std::string ConnectionManager::get_desired_target(std::string target_request, HTTPResponse::Status& status) {
-  std::filesystem::path target = SERVER_PATH;
+  std::filesystem::path target(SERVER_PATH);
   if (target_request == "/coffee") {
     // I'm a teapot!!
     status = HTTPResponse::Status::_418_IM_A_TEAPOT;
@@ -177,6 +177,7 @@ std::string ConnectionManager::get_desired_target(std::string target_request, HT
   
   // Not found!!
   status = HTTPResponse::Status::_404_NOT_FOUND;
-  target = SERVER_PATH / "404.html";
+  target = std::filesystem::path(SERVER_PATH) / "404.html";
+  
   return std::filesystem::is_regular_file(target) ? target.string() : "";
 }

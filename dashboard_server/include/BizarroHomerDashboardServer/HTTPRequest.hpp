@@ -34,11 +34,11 @@ private:
   bool parse_header(std::pair<std::string, std::string>& header);
   void parse_body();
   
-  std::string request_str;
-  Parser::Iter iter;
+  std::string m_request_str;
+  Parser::Iter m_iter;
   
-  HTTPMethod method;
-  std::string target;
+  HTTPMethod m_method;
+  std::string m_target;
   
-  std::map<std::string, std::string> headers;
+  std::map<std::string, std::string> m_headers;
 };

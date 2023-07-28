@@ -24,12 +24,12 @@ public:
   Preset get_preset();
   
 private:
-  Preset preset = Preset::LOW;
+  Preset m_preset = Preset::LOW;
   
-  thunder::TalonFX left_motor  { CAN_SHOOTER_PIVOT_LEFT };
-  thunder::TalonFX right_motor { CAN_SHOOTER_PIVOT_RIGHT };
+  thunder::TalonFX m_left_motor  { CAN_SHOOTER_PIVOT_LEFT };
+  thunder::TalonFX m_right_motor { CAN_SHOOTER_PIVOT_RIGHT };
   
-  const std::map<Preset, double> preset_positions {
+  const std::map<Preset, double> m_preset_positions {
     { Preset::LOW,  0.0 },
     { Preset::MID,  1.2 },
     { Preset::HIGH, 2.4 }, // MAX 2.8

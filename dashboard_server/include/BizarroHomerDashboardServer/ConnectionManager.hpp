@@ -19,23 +19,22 @@ public:
   void handle_new_connection(int client_fd);
   
 private:
-  
   struct Task {
     ConnectionHandlerFunction func;
     int client_fd;
   };
   
-  std::vector<std::thread> workers;
-  std::queue<Task> conn_tasks;
+  std::vector<std::thread> m_workers;
+  std::queue<Task> m_connection_tasks;
   
-  bool should_term = false;
+  bool m_should_term = false;
   
   void worker_thread();
-
+  
   void handle_connection(int client_fd, bool* should_term);
-
+  
   std::string get_desired_target(std::string target_request, HTTPResponse::Status& status);
   
-  std::mutex queue_mut;
-  std::condition_variable condition;
+  std::mutex m_queue_mutex;
+  std::condition_variable m_condition;
 };

@@ -18,24 +18,19 @@ public:
     COUNTER_CLOCKWISE = -1,
   };
   
-  /**
-   * @brief Starts rotating the barrel one increment in the specified direction.
-   *
-   * @param direction The direction to rotate the barrel.
-   */
+  //
+  // Manually rotates the barrel one increment in the specified direction.
+  //
   void rotate(RotationDirection direction);
   
-  /**
-   * @brief Returns whether the barrel should be rotating (when it's not at its
-   *        target position).
-   *
-   * @return Whether the barrel should be rotating.
-   */
+  //
+  // Returns whether the barrel is currently rotating.
+  //
   bool is_rotating();
   
 private:
-  /* TalonFX rot_motor { CAN_SHOOTER_ROTATION }; */
-  thunder::ThroughBore rot_enc { GPIO_SHOOTER_ROTATION_ENCODER };
+  /* TalonFX m_rot_motor { CAN_SHOOTER_ROTATION }; */
+  thunder::ThroughBore m_rot_enc { GPIO_SHOOTER_ROTATION_ENCODER };
   
   // Increments of 60 degrees.
   enum class Position {
@@ -47,6 +42,6 @@ private:
     _6 = 300,
   };
   
-  Position target_position = Position::_1;
-  bool at_position = false;
+  Position m_target_position = Position::_1;
+  bool m_at_position = false;
 };

@@ -12,6 +12,9 @@ public:
   DigitalOutput(int channel, std::optional<bool> default_set = std::nullopt);
   ~DigitalOutput();
   
+  void stop() override;
+  void set_enabled(bool enabled) override;
+  
   void set(bool output);
   bool get();
   
@@ -22,6 +25,8 @@ private:
   std::string m_channel_str;
   std::filesystem::path m_channel_path;
   std::filesystem::path m_channel_dir_path, m_channel_value_path;
+  
+  bool m_enabled = true;
 };
 
 } // namespace thunder
