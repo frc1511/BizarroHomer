@@ -1,4 +1,4 @@
-#include <BizarroHomerDiagnosticServer/HTTPRequest.hpp>
+#include <BizarroHomerDashboardServer/HTTPRequest.hpp>
 #include <map>
 
 HTTPRequest::HTTPRequest(std::string _request_str)

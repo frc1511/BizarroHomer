@@ -16,4 +16,4 @@ add_subdirectory("${BH_THIRDPARTY_DIR}/Phoenix")
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/shared")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/main")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/diagnostic_server")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dashboard_server")

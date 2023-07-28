@@ -1,6 +1,6 @@
-#include <BizarroHomerDiagnosticServer/ConnectionManager.hpp>
-#include <BizarroHomerDiagnosticServer/HTTPRequest.hpp>
-#include <BizarroHomerDiagnosticServer/DataManager.hpp>
+#include <BizarroHomerDashboardServer/ConnectionManager.hpp>
+#include <BizarroHomerDashboardServer/HTTPRequest.hpp>
+#include <BizarroHomerDashboardServer/DataManager.hpp>
 #include <unistd.h>
 #include <sys/fcntl.h>
 #include <fmt/core.h>
@@ -31,9 +31,11 @@ ConnectionManager::~ConnectionManager() {
 void ConnectionManager::handle_new_connection(int client_fd) {
   {
     std::lock_guard<std::mutex> lk(queue_mut);
-    conn_tasks.emplace([this](int client_fd, bool* _should_term) {
+    ConnectionHandlerFunction func = [this](int client_fd, bool* _should_term) {
       this->handle_connection(client_fd, _should_term);
-    }, client_fd);
+    };
+    // emplace() is being stupid so this'll have to do.
+    conn_tasks.push(Task{func, client_fd});
   }
   condition.notify_one();
 }

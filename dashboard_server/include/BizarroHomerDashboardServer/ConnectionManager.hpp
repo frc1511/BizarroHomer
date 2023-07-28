@@ -1,6 +1,6 @@
 #pragma once
 
-#include <BizarroHomerDiagnosticServer/HTTPResponse.hpp>
+#include <BizarroHomerDashboardServer/HTTPResponse.hpp>
 #include <cstddef>
 #include <vector>
 #include <thread>

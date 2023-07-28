@@ -1,4 +1,4 @@
-#include <BizarroHomerDiagnosticServer/Util/Parser.hpp>
+#include <BizarroHomerDashboardServer/Util/Parser.hpp>
 #include <fstream>
 #include <fmt/core.h>
 #include <cmath>

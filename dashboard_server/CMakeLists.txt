@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(BizarroHomerDiagnosticServer)
+project(BizarroHomerDashboardServer)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -35,7 +35,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt)
 install(TARGETS ${PROJECT_NAME} DESTINATION "/usr/local/bin")
 
 # Install systemd service.
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/BizarroHomerDiagnosticServer.service" DESTINATION "/etc/systemd/system")
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/BizarroHomerDashboardServer.service" DESTINATION "/etc/systemd/system")
 
 # Enable systemd service.
-install(CODE "execute_process(COMMAND systemctl enable BizarroHomerDiagnosticServer.service)")
+install(CODE "execute_process(COMMAND systemctl enable BizarroHomerDashboardServer.service)")

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <BizarroHomerDiagnosticServer/Util/Parser.hpp>
+#include <BizarroHomerDashboardServer/Util/Parser.hpp>
 #include <string>
 #include <utility>
 #include <map>

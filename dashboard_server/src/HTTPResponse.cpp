@@ -1,4 +1,4 @@
-#include <BizarroHomerDiagnosticServer/HTTPResponse.hpp>
+#include <BizarroHomerDashboardServer/HTTPResponse.hpp>
 #include <fmt/core.h>
 #include <map>
 
@@ -13,7 +13,7 @@ std::map<HTTPResponse::Status, std::string> status_str_map {
 HTTPResponse::HTTPResponse(Status status, void* content, std::size_t content_size) {
   response = fmt::format("HTTP/1.1 {}\n", status_str_map.at(status));
   response += "Connection: keep-alive\n";
-  response += "Server: Bizarro Homer Diagnostic Server\n";
+  response += "Server: Bizarro Homer Dashboard Server\n";
   response += fmt::format("Content-Length: {}\n", content_size);
   response += '\n';
   if (content_size) {

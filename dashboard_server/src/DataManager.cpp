@@ -1,4 +1,4 @@
-#include <BizarroHomerDiagnosticServer/DataManager.hpp>
+#include <BizarroHomerDashboardServer/DataManager.hpp>
 #include <BizarroHomerShared/IPC/IPCReceiver.hpp>
 #include <fmt/core.h>
 

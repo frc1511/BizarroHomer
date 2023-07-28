@@ -1,4 +1,4 @@
-#include <BizarroHomerDiagnosticServer/ConnectionManager.hpp>
+#include <BizarroHomerDashboardServer/ConnectionManager.hpp>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
@@ -25,8 +25,8 @@ int main(int argc, char** argv) {
   /* signal(SIGINT, signal_handler); */
   
   std::time_t start_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-  fmt::print(stdout, "Diagnostic Server Service starting at {}", std::ctime(&start_time));
-  fmt::print(stderr, "Diagnostic Server Service starting at {}", std::ctime(&start_time));
+  fmt::print(stdout, "Dashboard Server Service starting at {}", std::ctime(&start_time));
+  fmt::print(stderr, "Dashboard Server Service starting at {}", std::ctime(&start_time));
   
   int port = 80;
   
