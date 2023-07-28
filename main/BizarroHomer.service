@@ -10,8 +10,8 @@ ExecStart=/usr/local/bin/BizarroHomerMain
 Restart=always
 RestartSec=5
 KillMode=process
-StandardOutput=file:/var/frc1511/BizarroHomer/diagnostic_server/main_output.log
-StandardError=file:/var/frc1511/BizarroHomer/diagnostic_server/main_error.log
+StandardOutput=file:/var/frc1511/BizarroHomer/dashboard/main_output.log
+StandardError=file:/var/frc1511/BizarroHomer/dashboard/main_error.log
 
 [Install]
 WantedBy=multi-user.target

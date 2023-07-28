@@ -1,0 +1,17 @@
+[Unit]
+Description=Dashboard Server
+After=BizarroHomer.service
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=/usr/local/bin/BizarroHomerDashboardServer
+Restart=always
+RestartSec=5
+KillMode=process
+StandardOutput=file:/var/frc1511/BizarroHomer/dashboard/dashboard_server_output.log
+StandardError=file:/var/frc1511/BizarroHomer/dashboard/dashboard_server_error.log
+
+[Install]
+WantedBy=multi-user.target

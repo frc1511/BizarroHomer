@@ -58,7 +58,7 @@ void ConnectionManager::worker_thread() {
   }
 }
 
-#define SERVER_PATH std::filesystem::path("/var/frc1511/BizarroHomer/diagnostic_server/")
+#define SERVER_PATH std::filesystem::path("/var/frc1511/BizarroHomer/dashboard/")
 
 void ConnectionManager::handle_connection(int client_fd, bool* should_term) {
   using namespace std::literals::chrono_literals;
