@@ -2,8 +2,8 @@
 
 #include <BizarroHomer/Basic/Mechanism.hpp>
 #include <BizarroHomer/Hardware/IOMap.hpp>
-#include <BizarroHomer/Hardware/CAN_TalonFX.hpp>
-#include <BizarroHomer/Hardware/DutyCycle_ThroughBore.hpp>
+#include <BizarroHomer/Hardware/TalonFX.hpp>
+#include <BizarroHomer/Hardware/ThroughBore.hpp>
 
 class ShooterBarrel : public Mechanism {
 public:
@@ -35,7 +35,7 @@ public:
   
 private:
   /* TalonFX rot_motor { CAN_SHOOTER_ROTATION }; */
-  DutyCycle_ThroughBore rot_enc { GPIO_SHOOTER_ROTATION_ENCODER };
+  thunder::ThroughBore rot_enc { GPIO_SHOOTER_ROTATION_ENCODER };
   
   // Increments of 60 degrees.
   enum class Position {

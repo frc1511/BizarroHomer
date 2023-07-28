@@ -13,8 +13,8 @@ Drive::~Drive() {
 }
 
 void Drive::process() {
-  drive_left.set_percent(-target_left * 0.3);
-  drive_right.set_percent(target_right * 0.3);
+  drive_left.set(-target_left * 0.3);
+  drive_right.set(target_right * 0.3);
 }
 
 void Drive::tank_control(double left, double right) {

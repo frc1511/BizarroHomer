@@ -2,7 +2,7 @@
 
 #include <BizarroHomer/Basic/Mechanism.hpp>
 #include <BizarroHomer/Hardware/IOMap.hpp>
-#include <BizarroHomer/Hardware/Digital_Output.hpp>
+#include <BizarroHomer/Hardware/DigitalOutput.hpp>
 #include <chrono>
 
 class AirTank : public Mechanism {
@@ -33,6 +33,6 @@ private:
   std::chrono::steady_clock::time_point fill_close_time_point,
                                         shoot_close_time_point;
   
-  Digital_Output fill_valve, shoot_valve;
+  thunder::DigitalOutput fill_valve, shoot_valve;
 };
 

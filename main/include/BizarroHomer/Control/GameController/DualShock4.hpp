@@ -1,11 +1,14 @@
 #pragma once
 
-#include <BizarroHomerShared/IPC/IPCSender.hpp>
-#include <BizarroHomer/Util/Color.hpp>
 #include <filesystem>
+#include <set>
 #include <vector>
-#include <cstdint>
+#include <thread>
 #include <mutex>
+
+using namespace std::literals::chrono_literals;
+
+typedef struct _SDL_GameController SDL_GameController;
 
 class DualShock4_Button {
 public:
@@ -40,14 +43,25 @@ public:
   };
 };
 
-class DualShock4_LEDManager {
+class DualShock4 {
 public:
-  static inline DualShock4_LEDManager* get() {
+  static inline DualShock4* get() {
     return &instance;
   }
   
-  DualShock4_LEDManager(DualShock4_LEDManager const&) = delete;
-  DualShock4_LEDManager& operator=(DualShock4_LEDManager const&) = delete;
+  DualShock4(DualShock4 const&) = delete;
+  DualShock4& operator=(DualShock4 const&) = delete;
+  
+  bool is_connected();
+  bool try_connect();
+  
+  struct InputFrame {
+    uint16_t buttons = 0;
+    double axes[6] = { 0, 0, 0, 0, 0, 0 };
+  };
+  
+  void get_input(InputFrame* frame);
+  void set_rumble(double low_freq, double high_freq, std::chrono::milliseconds duration = 50ms);
   
   enum ColorBits {
     RED    = 1 << 0,
@@ -60,40 +74,28 @@ public:
   };
   
   void set_colors(uint8_t colors);
-  void update_controllers();
+  
+  double get_battery_percentage();
   
 private:
-  DualShock4_LEDManager();
-  ~DualShock4_LEDManager();
+  DualShock4();
+  ~DualShock4();
   
-  uint8_t colors = 0;
+  void rescan_leds();
+  void rescan_batteries();
+  
+  std::set<std::filesystem::path> m_led_paths;
+  std::set<std::filesystem::path> m_battery_paths;
+  
+  SDL_GameController* m_controller = nullptr;
+  
+  std::thread m_led_thread;
+  std::mutex m_led_mutex;
+  
+  bool m_led_should_term = false;
+  uint8_t m_led_colors = 0;
 
-  void send_msg(bool update_ctrl);
+  void led_thread();
   
-  IPCSender s;
-  std::mutex led_mutex;
-  
-  static DualShock4_LEDManager instance;
+  static DualShock4 instance;
 };
-
-class DualShock4_BatteryManager {
-public:
-  static inline DualShock4_BatteryManager* get() {
-    return &instance;
-  }
-  
-  DualShock4_BatteryManager(DualShock4_BatteryManager const&) = delete;
-  DualShock4_BatteryManager& operator=(DualShock4_BatteryManager const&) = delete;
-  
-  double get_percentage();
-  void rescan_controllers();
-  
-private:
-  DualShock4_BatteryManager();
-  ~DualShock4_BatteryManager();
-
-  std::vector<std::filesystem::path> ctrl_paths;
-  
-  static DualShock4_BatteryManager instance;
-};
-

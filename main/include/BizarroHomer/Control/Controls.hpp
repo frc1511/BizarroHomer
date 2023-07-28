@@ -1,15 +1,15 @@
 #pragma once
 
-#include <BizarroHomer/Hardware/CAN_PDP.hpp>
+#include <BizarroHomer/Hardware/PDP.hpp>
 #include <BizarroHomer/Basic/Mechanism.hpp>
-#include <BizarroHomer/Control/GameController/GameControllerManager.hpp>
+#include <BizarroHomer/Control/GameController/DualShock4.hpp>
 
 class Drive;
 class Shooter;
 
 class Controls : public Mechanism {
 public:
-  Controls(Drive* drive, Shooter* shooter, CAN_PDP* pdp);
+  Controls(Drive* drive, Shooter* shooter, thunder::PDP* pdp);
   ~Controls();
   
   void process() override;
@@ -17,9 +17,11 @@ public:
 private:
   Drive* drive;
   Shooter* shooter;
-  CAN_PDP* pdp;
+  thunder::PDP* pdp;
   
-  bool was_conn = false;
+  void handle_leds();
+  void handle_drive();
+  void handle_shooter();
   
   enum class DriveMode {
     TANK = 0,
@@ -29,7 +31,7 @@ private:
 
   bool was_pressurizing = false;
   
-  GameControllerManager::InputFrame input, last_input;
+  DualShock4::InputFrame input, last_input;
   
   uint8_t colors = 0, last_colors = 0;
 };

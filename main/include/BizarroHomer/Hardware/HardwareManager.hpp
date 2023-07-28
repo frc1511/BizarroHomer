@@ -1,11 +1,16 @@
 #pragma once
 
-#include <BizarroHomerShared/IPC/IPCSender.hpp>
-#include <mutex>
-#include <thread>
+#include <BizarroHomer/Hardware/HardwareComponent.hpp>
+#include <BizarroHomer/Util/Song.hpp>
+#include <ctre/phoenix/music/Orchestra.h>
+#include <optional>
 #include <functional>
 #include <vector>
 #include <utility>
+
+namespace thunder {
+
+class TalonFX;
 
 class HardwareManager {
 public:
@@ -16,66 +21,39 @@ public:
   HardwareManager(HardwareManager const&) = delete;
   HardwareManager& operator=(HardwareManager const&) = delete;
   
-  /**
-   * @brief Sets whether hardware components should be enabled.
-   *
-   * @param enabled Whether the hardware components should be enabled.
-   */
-  void set_enabled(bool enabled);
+  void register_hardware(HardwareComponent* hardware);
+  void register_talon_fx(TalonFX* talon_fx);
   
-  void reset_hardware();
+  void stop_all_hardware();
   
-  enum class HardwareType : uint8_t {
-    DIGITAL_IN       = 0,
-    DIGITAL_OUT      = 1,
-    CAN_TALON_FX     = 2,
-    PWM_SPARK_MAX    = 3,
-    ABS_THROUGH_BORE = 4,
-    CAN_PDP          = 5,
+  void start_song(Song song);
+  void process_orchestra();
+  bool is_song_playing();
+  
+  inline static const Song HOME_DEPOT_BEAT {
+    "home_depot_beat_primary.chrp",
+    "home_depot_beat_secondary.chrp",
+    30s
   };
-  
-  enum class ControlProperty : uint8_t {
-    INIT     = 0,
-    DIGITAL  = 1,
-    PERCENT  = 2,
-    POSITION = 3,
-    MUSIC    = 4,
+  inline static const Song THUNDERSTRUCK {
+    "thunderstruck.chrp",
+    30s
   };
-  
-  void send_ctrl_msg(HardwareType type, uint8_t id, ControlProperty prop, double value);
-  
-  void start_music();
-  
-  enum class StatusProperty : uint8_t {
-    VALUE = 0,
-    ENCODER = 1,
-    CURRENT = 2,
-    VELOCITY = 3,
-  };
-  
-  using StatusCallbackFunc = std::function<void(double value)>;
-  
-  void register_status_callback(HardwareType type, uint8_t id, StatusProperty prop, StatusCallbackFunc callback);
   
 private:
   HardwareManager();
   ~HardwareManager();
+
+  void set_falcons_enabled(bool enabled);
   
-  IPCSender s;
+  std::vector<HardwareComponent*> m_all_hardware;
+  std::vector<TalonFX*> m_talon_fxs;
   
-  std::thread status_thread;
-  std::mutex control_mutex,
-             status_mutex;
-  
-  struct StatusCallbackID {
-    HardwareType type;
-    uint8_t id;
-    StatusProperty prop;
-  };
-  
-  std::vector<std::pair<StatusCallbackID, StatusCallbackFunc>> status_callbacks;
-  
-  void status_thread_main();
+  ctre::phoenix::music::Orchestra m_orchestra_primary;
+  ctre::phoenix::music::Orchestra m_orchestra_secondary;
+  std::optional<Song> m_current_song = std::nullopt;
   
   static HardwareManager instance;
 };
+
+} // namespace thunder

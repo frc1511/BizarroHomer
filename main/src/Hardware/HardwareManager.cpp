@@ -1,109 +1,89 @@
 #include <BizarroHomer/Hardware/HardwareManager.hpp>
-#include <BizarroHomerShared/IPC/IPCReceiver.hpp>
+#include <BizarroHomer/Hardware/TalonFX.hpp>
 #include <fmt/core.h>
 #include <cstring>
 #include <cerrno>
 #include <chrono>
 
-enum ControlMessageType {
-  MSG_CONTROL = 1,
-  MSG_ENABLE  = 2,
-  MSG_DISABLE = 3,
-  MSG_RESET   = 4,
-};
+thunder::HardwareManager::HardwareManager() = default;
 
-struct IPCControlMessage {
-  long mtype;
-  struct Data {
-    uint8_t control_type;
-    uint8_t hardware_type;
-    uint8_t hardware_id;
-    uint8_t hardware_prop;
-    double value;
-  } data;
-};
+thunder::HardwareManager::~HardwareManager() = default;
 
-struct IPCStatusMessage {
-  long mtype = 1;
-  struct Data {
-    uint8_t hardware_type;
-    uint8_t hardware_id;
-    uint8_t hardware_prop;
-    double value;
-  } data;
-};
+void thunder::HardwareManager::register_hardware(HardwareComponent* hardware) {
+  m_all_hardware.push_back(hardware);
+}
 
-HardwareManager::HardwareManager()
-: s(IPC_PATHNAME, 'C'), status_thread([this]() { this->status_thread_main(); }) { }
-
-HardwareManager::~HardwareManager() { }
-
-void HardwareManager::set_enabled(bool enabled) {
-  IPCControlMessage msg;
-  std::memset(&msg, 0, sizeof(IPCControlMessage));
-  // Set the message type.
-  msg.mtype = 1;
-  msg.data.control_type = enabled ? MSG_ENABLE : MSG_DISABLE;
+void thunder::HardwareManager::register_talon_fx(TalonFX* talon_fx) {
+  m_talon_fxs.push_back(talon_fx);
   
-  // Send the message.
-  std::lock_guard<std::mutex> lk(control_mutex);
-  s.send_msg(msg);
-}
-
-void HardwareManager::reset_hardware() {
-  IPCControlMessage msg;
-  std::memset(&msg, 0, sizeof(IPCControlMessage));
-  // Set the message type to reset.
-  msg.mtype = 1;
-  msg.data.control_type = MSG_RESET;
+  register_hardware(reinterpret_cast<HardwareComponent*>(talon_fx));
   
-  // Send the message.
-  std::lock_guard<std::mutex> lk(control_mutex);
-  s.send_msg(msg);
-}
-
-void HardwareManager::send_ctrl_msg(HardwareType type, uint8_t id, ControlProperty prop, double value) {
-  IPCControlMessage msg;
-  msg.mtype = 1;
-  msg.data.control_type = MSG_CONTROL;
-  msg.data.hardware_type = static_cast<uint8_t>(type);
-  msg.data.hardware_id = id;
-  msg.data.hardware_prop = static_cast<uint8_t>(prop);
-  msg.data.value = value;
-  
-  // Send the message.
-  std::lock_guard<std::mutex> lk(control_mutex);
-  s.send_msg(msg);
-}
-
-void HardwareManager::start_music() {
-  send_ctrl_msg(HardwareType::CAN_TALON_FX, 0, ControlProperty::MUSIC, 0.0);
-}
-
-void HardwareManager::register_status_callback(HardwareType type, uint8_t id, StatusProperty prop, StatusCallbackFunc callback) {
-  std::lock_guard<std::mutex> lk(status_mutex);
-  status_callbacks.emplace_back(StatusCallbackID { type, id, prop }, callback);
-}
-
-void HardwareManager::status_thread_main() {
-  IPCReceiver r(IPC_PATHNAME, 'S');
-  
-  while (true) {
-    IPCStatusMessage msg;
-    if (!r.recv_msg(&msg)) break;
-    
-    // Find callback.
-    std::lock_guard<std::mutex> lk(status_mutex);
-    decltype(status_callbacks)::const_iterator it = std::find_if(status_callbacks.cbegin(), status_callbacks.cend(), [&msg](auto p) {
-      return msg.data.hardware_type == static_cast<uint8_t>(p.first.type) &&
-             msg.data.hardware_id   == p.first.id &&
-             msg.data.hardware_prop == static_cast<uint8_t>(p.first.prop);
-    });
-    
-    if (it != status_callbacks.cend()) {
-      it->second(msg.data.value);
-    }
+  // Add to orchestra.
+  if (m_talon_fxs.size() == 2 ) { // 3) {
+    m_orchestra_secondary.AddInstrument(*m_talon_fxs.back()->get_talon());
+  }
+  else {
+    m_orchestra_primary.AddInstrument(*m_talon_fxs.back()->get_talon());
   }
 }
 
-HardwareManager HardwareManager::instance;
+void thunder::HardwareManager::stop_all_hardware() {
+  for (HardwareComponent* hardware : m_all_hardware) {
+    hardware->stop();
+  }
+}
+
+void thunder::HardwareManager::start_song(Song song) {
+  if (m_current_song) {
+    return;
+  }
+  
+  // Set the current song.
+  m_current_song = song;
+  
+  // Disable the falcons.
+  set_falcons_enabled(false);
+  
+  // Load the music.
+  m_orchestra_primary.LoadMusic(song.primary_chrp);
+  m_orchestra_secondary.LoadMusic(song.secondary_chrp);
+  
+  // Play the music.
+  m_orchestra_primary.Play();
+  m_orchestra_secondary.Play();
+}
+
+void thunder::HardwareManager::process_orchestra() {
+  if (!m_current_song) {
+    return;
+  }
+  
+  // Check the duration of the song.
+  if (m_orchestra_primary.GetCurrentTime() < m_current_song->length.count()) {
+    // Still playing, so keep the falcons disabled.
+    set_falcons_enabled(false);
+    return;
+  }
+  
+  // Stop the music.
+  m_orchestra_primary.Stop();
+  m_orchestra_secondary.Stop();
+  
+  // Enable the falcons.
+  set_falcons_enabled(true);
+  
+  // Clear the current song.
+  m_current_song = std::nullopt;
+}
+
+bool thunder::HardwareManager::is_song_playing() {
+  return m_current_song.has_value();
+}
+
+void thunder::HardwareManager::set_falcons_enabled(bool enabled) {
+  for (TalonFX* talon_fx : m_talon_fxs) {
+    talon_fx->set_enabled(enabled);
+  }
+}
+
+thunder::HardwareManager thunder::HardwareManager::instance;

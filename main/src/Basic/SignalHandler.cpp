@@ -31,10 +31,10 @@ void SignalHandler::sig_handler(int sig) {
   fmt::print("Signal {} caught. Exiting now...\n", sig);
   
   // Disable hardware.
-  HardwareManager::get()->set_enabled(false);
+  thunder::HardwareManager::get()->stop_all_hardware();
   
   // Set controller LED colors to signify program ended.
-  DualShock4_LEDManager::get()->set_colors(DualShock4_LEDManager::ColorBits::BLUE | DualShock4_LEDManager::ColorBits::OFF);
+  DualShock4::get()->set_colors(DualShock4::ColorBits::BLUE | DualShock4::ColorBits::OFF);
   
   exit(0);
 }

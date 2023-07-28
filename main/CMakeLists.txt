@@ -36,6 +36,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL2_LIBRARIES})
 # fmt
 target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt)
 
+# Phoenix
+target_link_libraries(${PROJECT_NAME} PRIVATE Phoenix)
+
 # Install program.
 install(TARGETS ${PROJECT_NAME} DESTINATION "/usr/local/bin")
 

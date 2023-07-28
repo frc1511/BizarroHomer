@@ -2,7 +2,7 @@
 
 #include <BizarroHomer/Basic/Mechanism.hpp>
 #include <BizarroHomer/Hardware/IOMap.hpp>
-#include <BizarroHomer/Hardware/CAN_TalonFX.hpp>
+#include <BizarroHomer/Hardware/TalonFX.hpp>
 #include <map>
 
 class ShooterPivot : public Mechanism {
@@ -26,8 +26,8 @@ public:
 private:
   Preset preset = Preset::LOW;
   
-  CAN_TalonFX left_motor  { CAN_SHOOTER_PIVOT_LEFT };
-  CAN_TalonFX right_motor { CAN_SHOOTER_PIVOT_RIGHT };
+  thunder::TalonFX left_motor  { CAN_SHOOTER_PIVOT_LEFT };
+  thunder::TalonFX right_motor { CAN_SHOOTER_PIVOT_RIGHT };
   
   const std::map<Preset, double> preset_positions {
     { Preset::LOW,  0.0 },

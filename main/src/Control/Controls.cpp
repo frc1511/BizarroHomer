@@ -3,7 +3,6 @@
 #include <BizarroHomer/Shooter/Shooter.hpp>
 #include <BizarroHomer/Hardware/HardwareManager.hpp>
 
-#include <BizarroHomer/Control/GameController/DualShock4.hpp>
 #include <BizarroHomer/Hardware/IOMap.hpp>
 #include <fmt/core.h>
 #include <cmath>
@@ -20,68 +19,58 @@
 #define BUTTON_RELEASED(b) \
   !static_cast<bool>(input.buttons & b) && static_cast<bool>(last_input.buttons & b)
 
-Controls::Controls(Drive* _drive, Shooter* _shooter, CAN_PDP* _pdp)
-: drive(_drive), shooter(_shooter), pdp(_pdp) {
-  
-  // Register game controller.
-  GameControllerManager::get()->register_controller(GC_DRIVER);
-}
+Controls::Controls(Drive* _drive, Shooter* _shooter, thunder::PDP* _pdp)
+: drive(_drive), shooter(_shooter), pdp(_pdp) { }
 
-Controls::~Controls() {
-
-}
+Controls::~Controls() = default;
 
 void Controls::process() {
   last_input = input;
-  input = GameControllerManager::InputFrame{};
+  input = DualShock4::InputFrame{};
   
-  if (!GameControllerManager::get()->get_controller_connected(GC_DRIVER)) {
-    // Controller not connected... FREAK OUT!!!!
-    
-    drive->tank_control(0.0, 0.0);
-    
-    was_conn = false;
-    
+  handle_leds();
+  
+  // Get input from controller.
+  DualShock4::get()->get_input(&input);
+  if (!DualShock4::get()->is_connected()) {
     return;
   }
-
-  if (!was_conn) {
-    DualShock4_LEDManager::get()->update_controllers();
-    DualShock4_BatteryManager::get()->rescan_controllers();
-  }
   
+  handle_drive();
+  handle_shooter();
+}
+
+void Controls::handle_leds() {
   colors = 0;
   
   // Robot battery low.
   if (pdp->get_voltage() < 12.0) {
-    colors |= DualShock4_LEDManager::ColorBits::RED;
+    colors |= DualShock4::ColorBits::RED;
   }
   // Controller battery low.
-  if (DualShock4_BatteryManager::get()->get_percentage() <= 0.2) {
-    colors |= DualShock4_LEDManager::ColorBits::YELLOW;
+  if (DualShock4::get()->get_battery_percentage() <= 0.2) {
+    colors |= DualShock4::ColorBits::YELLOW;
   }
   // Warn about shooter pressure.
   if (shooter->is_at_pressure()) {
-    colors |= DualShock4_LEDManager::ColorBits::ORANGE;
+    colors |= DualShock4::ColorBits::ORANGE;
   }
   else if (shooter->has_pressure()) {
-    colors |= DualShock4_LEDManager::ColorBits::PURPLE;
+    colors |= DualShock4::ColorBits::PURPLE;
   }
   
   // Green if everything is good.
   if (!colors) {
-    colors = DualShock4_LEDManager::ColorBits::GREEN;
+    colors = DualShock4::ColorBits::GREEN;
   }
   
-  if (colors != last_colors || !was_conn) {
-    DualShock4_LEDManager::get()->set_colors(colors);
+  if (colors != last_colors) {
+    DualShock4::get()->set_colors(colors);
     last_colors = colors;
-    was_conn = true;
   }
-  
-  // Get input from controller.
-  GameControllerManager::get()->get_input(GC_DRIVER, &input);
-  
+}
+
+void Controls::handle_drive() {
   auto improve_axis = [](double axis) -> double {
     // Deadzone.
     if (std::abs(axis) < 0.1) return 0.0;
@@ -90,7 +79,7 @@ void Controls::process() {
   };
   
   if (BUTTON_PRESSED(DualShock4_Button::PLAYSTATION)) {
-    HardwareManager::get()->start_music();
+    thunder::HardwareManager::get()->start_song(thunder::HardwareManager::HOME_DEPOT_BEAT);
   }
   
   // Toggle drive mode.
@@ -112,29 +101,31 @@ void Controls::process() {
     
     drive->tank_control(left, right);
   }
-  
+}
+
+void Controls::handle_shooter() {
   // Pivot presets.
   if (BUTTON_PRESSED(DualShock4_Button::DPAD_UP)) {
     shooter->set_preset(ShooterPivot::Preset::HIGH);
-    fmt::print("Preset HIGH\n");
+    fmt::print("Pivot preset HIGH\n");
   }
   if (BUTTON_PRESSED(DualShock4_Button::DPAD_RIGHT)) {
     shooter->set_preset(ShooterPivot::Preset::MID);
-    fmt::print("Preset MID\n");
+    fmt::print("Pivot preset MID\n");
   }
   if (BUTTON_PRESSED(DualShock4_Button::DPAD_DOWN)) {
     shooter->set_preset(ShooterPivot::Preset::LOW);
-    fmt::print("Preset LOW\n");
+    fmt::print("Pivot preset LOW\n");
   }
   
   // Barrel rotation.
   if (BUTTON_PRESSED(DualShock4_Button::SHARE)) {
     shooter->rotate_barrel(ShooterBarrel::RotationDirection::CLOCKWISE);
-    fmt::print("Barrel CLOCKWISE\n");
+    fmt::print("Barrel rotate CLOCKWISE\n");
   }
   if (BUTTON_PRESSED(DualShock4_Button::OPTIONS)) {
     shooter->rotate_barrel(ShooterBarrel::RotationDirection::COUNTER_CLOCKWISE);
-    fmt::print("Barrel COUNTER CLOCKWISE\n");
+    fmt::print("Barrel rotate COUNTER CLOCKWISE\n");
   }
   
   bool is_pressuzizing = false;
