@@ -27,3 +27,6 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dashboard_server")
 
 # Install dashboard site.
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/dashboard" DESTINATION "/var/frc1511/BizarroHomer")
+
+# Install music files.
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/music" DESTINATION "/var/frc1511/BizarroHomer")
