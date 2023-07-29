@@ -6,7 +6,8 @@
 
 AirTank::AirTank()
 : m_fill_valve(GPIO_FILL_VALVE, VALVE_CLOSED),
-  m_shoot_valve(GPIO_SHOOT_VALVE, VALVE_CLOSED) {
+  m_shoot_valve(GPIO_SHOOT_VALVE, VALVE_CLOSED),
+  m_pressure_transducer(I2C_PRESSURE_TRANSDUCER) {
   
   m_fill_close_time_point = std::chrono::steady_clock::now();
   m_shoot_close_time_point = std::chrono::steady_clock::now();
@@ -16,6 +17,9 @@ AirTank::~AirTank() = default;
 
 void AirTank::process() {
   using namespace std::literals::chrono_literals;
+  
+  // Read the pressure!!!
+  m_pressure = m_pressure_transducer.read_pressure();
   
   auto safe_to_open_valve = [](auto close_time_point) -> bool {
     auto now = std::chrono::steady_clock::now();
@@ -72,13 +76,11 @@ void AirTank::set_state(State state) {
 }
 
 bool AirTank::is_at_pressure() {
-  // TODO: Detect pressure...
-  return false;
+  return m_pressure >= 120;
 }
 
-bool AirTank::has_pressure() {
-  // TODO: Detect pressure...
-  return false;
+double AirTank::get_pressure() {
+  return m_pressure;
 }
 
 bool AirTank::is_shooting() {

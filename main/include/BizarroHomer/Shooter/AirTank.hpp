@@ -3,6 +3,7 @@
 #include <BizarroHomer/Basic/Mechanism.hpp>
 #include <BizarroHomer/Hardware/IOMap.hpp>
 #include <BizarroHomer/Hardware/DigitalOutput.hpp>
+#include <BizarroHomer/Hardware/PressureTransducer.hpp>
 #include <chrono>
 
 class AirTank : public Mechanism {
@@ -29,7 +30,7 @@ public:
   //
   // Whether the fill tank has any pressure.
   //
-  bool has_pressure();
+  double get_pressure();
   
   //
   // Whether the shoot valve is open.
@@ -44,5 +45,8 @@ private:
                                         m_shoot_close_time_point;
   
   thunder::DigitalOutput m_fill_valve, m_shoot_valve;
+  thunder::PressureTransducer m_pressure_transducer;
+  
+  double m_pressure = 0.0;
 };
 

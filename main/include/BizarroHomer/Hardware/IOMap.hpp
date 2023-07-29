@@ -24,5 +24,8 @@
 #define GPIO_SHOOT_VALVE 27
 #define GPIO_PRESSURE_SWITCH 22
 
+// I2C
+#define I2C_PRESSURE_TRANSDUCER 0
+
 // Game Controllers
 #define GC_DRIVER 0
