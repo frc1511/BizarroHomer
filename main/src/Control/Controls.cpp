@@ -27,6 +27,8 @@ Controls::~Controls() = default;
 void Controls::process() {
   last_input = input;
   input = DualShock4::InputFrame{};
+
+  fmt::print("Controls\n");
   
   handle_leds();
   
