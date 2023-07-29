@@ -17,6 +17,9 @@ DualShock4::DualShock4() {
   SDL_Init(SDL_INIT_GAMECONTROLLER);
   
   m_controller = SDL_GameControllerOpen(0);
+  
+  rescan_leds();
+  rescan_batteries();
 }
 
 DualShock4::~DualShock4() {
@@ -36,10 +39,18 @@ bool DualShock4::try_connect() {
     return true;
   }
   
+  SDL_Quit();
+  SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1"); //so Ctrl-C still works
+  SDL_Init(SDL_INIT_GAMECONTROLLER);
+  
   m_controller = SDL_GameControllerOpen(0);
   if (!m_controller) {
     return false;
   }
+  m_controller_id = 0;
+  
+  rescan_leds();
+  rescan_batteries();
   
   return true;
 }
@@ -47,7 +58,7 @@ bool DualShock4::try_connect() {
 void DualShock4::get_input(InputFrame* frame) {
   // Clear input.
   frame->buttons = 0;
-  std::memset(frame->axes, 0, 6);
+  std::memset(frame->axes, 0, 6 * sizeof(double));
   
   if (!try_connect()) {
     return;
@@ -60,12 +71,22 @@ void DualShock4::get_input(InputFrame* frame) {
       return;
     }
     // Handle disconnection.
+    else if (event.type == SDL_CONTROLLERDEVICEADDED) {
+      fmt::print("Controller connected\n");
+      
+      if (m_controller) {
+        SDL_GameControllerClose(m_controller);
+        m_controller = nullptr;
+      }
+      m_controller_id = event.cdevice.which;
+      m_controller = SDL_GameControllerOpen(m_controller_id);
+    }
     else if (event.type == SDL_CONTROLLERDEVICEREMOVED) {
-      fmt::print(stderr, "Controller disconnected\n");
+      fmt::print("Controller disconnected\n");
       
       // Make sure it's the right controller.
       uint16_t which = event.cdevice.which;
-      if (which == 0) {
+      if (which == m_controller_id) {
         SDL_GameControllerClose(m_controller);
         m_controller = nullptr;
         return;

@@ -87,6 +87,7 @@ private:
   std::set<std::filesystem::path> m_led_paths;
   std::set<std::filesystem::path> m_battery_paths;
   
+  int m_controller_id = 0;
   SDL_GameController* m_controller = nullptr;
   
   std::thread m_led_thread;
