@@ -12,7 +12,7 @@ public:
   ~AirTank();
   
   void process() override;
-  void send_feedback() override;
+  void send_feedback(DashboardServer* dashboard) override;
   
   enum class State {
     IDLE,         // Both valves closed.

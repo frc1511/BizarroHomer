@@ -13,19 +13,19 @@ public:
   ~Shooter();
   
   void process() override;
-  void send_feedback() override;
+  void send_feedback(DashboardServer* dashboard) override;
   
   void shoot();
   void pressurize();
   
   bool is_at_pressure();
   bool has_pressure();
+  double get_pressure();
   
   void rotate_barrel(ShooterBarrel::RotationDirection direction);
   
-  void set_preset(ShooterPivot::Preset preset);
-  
-  ShooterPivot::Preset get_preset();
+  void set_pivot_preset(ShooterPivot::Preset preset);
+  void manual_pivot_control(double speed);
   
 private:
   AirTank m_air_tank;

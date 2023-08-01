@@ -12,7 +12,7 @@ public:
   ~Drive();
   
   void process() override;
-  void send_feedback() override;
+  void send_feedback(DashboardServer* dashboard) override;
   
   void tank_control(double left, double right);
   void arcade_control(double forwards, double turn);

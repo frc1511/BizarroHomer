@@ -61,7 +61,7 @@ public:
   };
   
   void get_input(InputFrame* frame);
-  void set_rumble(double low_freq, double high_freq, std::chrono::milliseconds duration = 50ms);
+  void set_rumble(double low_freq, double high_freq, std::chrono::milliseconds duration = 100ms);
   
   enum ColorBits {
     RED    = 1 << 0,

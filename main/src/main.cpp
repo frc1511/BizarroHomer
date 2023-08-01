@@ -1,6 +1,7 @@
 #include <BizarroHomer/Basic/SignalHandler.hpp>
 #include <BizarroHomer/Basic/Robot.hpp>
 #include <BizarroHomer/Hardware/HardwareManager.hpp>
+#include <BizarroHomer/DashboardServer/DashboardServer.hpp>
 #include <ctre/phoenix/unmanaged/Unmanaged.h>
 #include <fmt/core.h>
 #include <thread>
@@ -22,7 +23,8 @@ int main() {
   // Start Phoenix diagnostic server immediately.
   ctre::phoenix::unmanaged::Unmanaged::SetPhoenixDiagnosticsStartTime(0);
   
-  Robot robot;
+  DashboardServer dashboard_server;
+  Robot robot { &dashboard_server };
   
   while (!SignalHandler::get()->should_exit()) {
     using namespace std::literals::chrono_literals;
@@ -34,6 +36,9 @@ int main() {
     
     // Robot periodic loop.
     robot.process();
+    
+    // Dashboard server periodic loop.
+    dashboard_server.process();
     
     auto end_time_point = std::chrono::high_resolution_clock::now();
     

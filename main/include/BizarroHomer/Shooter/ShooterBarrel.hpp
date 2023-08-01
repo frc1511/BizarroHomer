@@ -4,6 +4,7 @@
 #include <BizarroHomer/Hardware/IOMap.hpp>
 #include <BizarroHomer/Hardware/TalonFX.hpp>
 #include <BizarroHomer/Hardware/ThroughBore.hpp>
+#include <chrono>
 
 class ShooterBarrel : public Mechanism {
 public:
@@ -11,7 +12,7 @@ public:
   ~ShooterBarrel();
   
   void process() override;
-  void send_feedback() override;
+  void send_feedback(DashboardServer* dashboard) override;
   
   enum class RotationDirection {
     CLOCKWISE = +1,
@@ -29,19 +30,16 @@ public:
   bool is_rotating();
   
 private:
-  /* TalonFX m_rot_motor { CAN_SHOOTER_ROTATION }; */
-  thunder::ThroughBore m_rot_enc { GPIO_SHOOTER_ROTATION_ENCODER };
+  thunder::TalonFX m_motor { CAN_SHOOTER_ROTATION };
+  thunder::ThroughBore m_encoder { GPIO_SHOOTER_ROTATION_ENCODER };
   
   // Increments of 60 degrees.
-  enum class Position {
-    _1 = 0,
-    _2 = 60,
-    _3 = 120,
-    _4 = 180,
-    _5 = 240,
-    _6 = 300,
-  };
+  int m_target_increment = 0;
+  double m_target_position = 0.0;
   
-  Position m_target_position = Position::_1;
   bool m_at_position = false;
+  
+  bool m_init = false;
+  std::chrono::system_clock::time_point m_init_time_point;
+  bool m_init_waiting = false;
 };

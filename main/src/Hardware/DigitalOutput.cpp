@@ -30,6 +30,8 @@ thunder::DigitalOutput::DigitalOutput(int channel, std::optional<bool> default_s
 }
 
 thunder::DigitalOutput::~DigitalOutput() {
+  stop();
+  
   // Write the channel number to the unexport file.
   int export_fd = open("/sys/class/gpio/unexport", O_WRONLY);
   write(export_fd, m_channel_str.c_str(), m_channel_str.size());

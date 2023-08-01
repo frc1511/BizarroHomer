@@ -1,5 +1,4 @@
 #include <BizarroHomer/Shooter/AirTank.hpp>
-#include <BizarroHomer/Basic/FeedbackManager.hpp>
 
 #define VALVE_CLOSED 0
 #define VALVE_OPEN (!VALVE_CLOSED)
@@ -87,7 +86,7 @@ bool AirTank::is_shooting() {
   return m_fill_valve.get();
 }
 
-void AirTank::send_feedback() {
+void AirTank::send_feedback(DashboardServer* dashboard) {
   std::string state_str;
   switch (m_next_state) {
     case State::IDLE:
@@ -101,7 +100,7 @@ void AirTank::send_feedback() {
       break;
   }
   
-  FeedbackManager::get()->send_value("AirTank_NextState", state_str);
+  dashboard->update_value("AirTank_NextState", state_str);
 
   bool _fill = m_fill_valve.get();
   bool _shoot = m_shoot_valve.get();
@@ -117,5 +116,5 @@ void AirTank::send_feedback() {
     state_str = "BAD THINGS!!";
   }
   
-  FeedbackManager::get()->send_value("AirTank_CurrState", state_str);
+  dashboard->update_value("AirTank_CurrState", state_str);
 }

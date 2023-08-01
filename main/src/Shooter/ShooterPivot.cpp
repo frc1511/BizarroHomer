@@ -1,49 +1,65 @@
 #include <BizarroHomer/Shooter/ShooterPivot.hpp>
-#include <BizarroHomer/Basic/FeedbackManager.hpp>
+#include <cassert>
 
-#define POSITION_TOLERANCE 0.5
+//
+// The number of encoder ticks in one rotation of the motor.
+//
+#define ROTATION_TICKS 2048.0
 
-#define PROPORTIONAL 0.015
+//
+// Simple P control loop.
+//
+#define PROP_GAIN 0.00012
 
-#define MAX_OUTPUT .3
+//
+// Some feed-forward gain since the shooter is pretty heavy.
+//
+#define FEED_FORWARD_GAIN 0.0
 
 ShooterPivot::ShooterPivot() {
-  // TODO: Set one to inverted...
+  // Set one inverted since they are mounted on opposite sides of the robot.
+  m_left_motor.set_inverted(false);
+  m_right_motor.set_inverted(true);
+  
+  // Configure closed-loop control for both motors.
+  for (thunder::TalonFX* motor : { &m_left_motor, &m_right_motor }) {
+    motor->config_p(PROP_GAIN);
+    motor->config_i(0.0);
+    motor->config_d(0.0);
+    motor->config_ff(FEED_FORWARD_GAIN);
+    motor->config_izone(0.0);
+  }
 }
 
-ShooterPivot::~ShooterPivot() {
-
-}
+ShooterPivot::~ShooterPivot() = default;
 
 void ShooterPivot::process() {
-  /* double current_pos = m_left_motor.get_position(); */
-  /* double target_pos = m_preset_positions.at(preset); */
-  
-  /* double diff = target_pos - current_pos; */
-  
-  /* if (diff < POSITION_TOLERANCE) { */
-    /* m_left_motor.set_percent(0.0); */
-    /* m_right_motor.set_percent(0.0); */
-    /* return; */
-  /* } */
-  
-  /* double pct_out = PROPORTIONAL * diff; */
-  /* pct_out = std::clamp(pct_out, -MAX_OUTPUT, +MAX_OUTPUT); */
-  
-  // Rotate!
-  /* m_left_motor.set_percent(pct_out); */
-  /* m_right_motor.set_percent(pct_out); */
+  // Set the target position for both motors.
+  m_left_motor.set(TalonFXControlMode::Position, m_target_position * ROTATION_TICKS);
+  m_right_motor.set(TalonFXControlMode::Position, m_target_position * ROTATION_TICKS);
 }
 
 void ShooterPivot::set_preset(Preset preset) {
-  m_preset = preset;
+  m_target_position = m_preset_positions.at(preset);
 }
 
-ShooterPivot::Preset ShooterPivot::get_preset() {
-  return m_preset;
+void ShooterPivot::manual_control(double speed) {
+  // About 1 rotation per second since the main loop runs at 50Hz.
+  m_target_position += 0.02 * speed;
+  
+  double low_preset = m_preset_positions.at(Preset::LOW);
+  double high_preset = m_preset_positions.at(Preset::HIGH);
+  
+  // Clamp the target position to the range of the pivot.
+  m_target_position = std::clamp(m_target_position, low_preset, high_preset);
 }
 
-void ShooterPivot::send_feedback() {
-  FeedbackManager::get()->send_value("Pivot_Position_Left", std::to_string(-m_left_motor.get_position()));
-  FeedbackManager::get()->send_value("Pivot_Position_Right", std::to_string(m_right_motor.get_position()));
+double ShooterPivot::get_position() {
+  return m_left_motor.get_position() / ROTATION_TICKS;
+}
+
+void ShooterPivot::send_feedback(DashboardServer* dashboard) {
+  dashboard->update_value("Pivot_Position_Left",  m_left_motor.get_position() / 2048.0);
+  dashboard->update_value("Pivot_Position_Right", m_right_motor.get_position() / 2048.0);
+  dashboard->update_value("Pivot_TargetPosition", m_target_position);
 }

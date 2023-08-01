@@ -1,5 +1,6 @@
 #pragma once
 
+#include <BizarroHomer/DashboardServer/DashboardServer.hpp>
 #include <BizarroHomer/Hardware/PDP.hpp>
 #include <BizarroHomer/Basic/Mechanism.hpp>
 #include <BizarroHomer/Drive/Drive.hpp>
@@ -9,20 +10,22 @@
 
 class Robot {
 public:
-  Robot();
+  Robot(DashboardServer* dashboard_server);
   ~Robot();
   
   // Called every 20ms.
   void process();
   
 private:
-  thunder::PDP pdp { 0 };
+  DashboardServer* m_dashboard_server;
   
-  Drive drive;
-  Shooter shooter;
-  Controls controls { &drive, &shooter, &pdp };
+  thunder::PDP m_pdp { 0 };
   
-  std::vector<Mechanism*> all_mechanisms {
-    &drive, &controls, &shooter
+  Drive m_drive;
+  Shooter m_shooter;
+  Controls m_controls { &m_drive, &m_shooter, &m_pdp };
+  
+  std::vector<Mechanism*> m_all_mechanisms {
+    &m_drive, &m_controls, &m_shooter
   };
 };

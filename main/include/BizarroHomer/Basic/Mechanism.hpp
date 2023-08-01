@@ -1,5 +1,7 @@
 #pragma once
 
+#include <BizarroHomer/DashboardServer/DashboardServer.hpp>
+
 class Mechanism {
 public:
   virtual ~Mechanism() { }
@@ -13,7 +15,7 @@ public:
   
   /**
    * @brief Send operational and/or diagnostic feedback to the operator of the
-   *        robot.
+   *        robot via the dashboard.
    */
-  virtual void send_feedback() { }
+  virtual void send_feedback(DashboardServer* dashboard) { }
 };

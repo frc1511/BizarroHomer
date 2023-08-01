@@ -4,6 +4,17 @@
 thunder::TalonFX::TalonFX(int can_id)
 : m_motor(can_id) {
   
+  TalonFXConfiguration configs;
+  m_motor.GetAllConfigs(configs);
+  
+  // Config the motor to use the integrated encoder for PID loop.
+  configs.primaryPID.selectedFeedbackSensor = FeedbackDevice::IntegratedSensor;
+  
+  m_motor.ConfigAllSettings(configs);
+  
+  
+  set_position(0.0);
+  
   HardwareManager::get()->register_hardware(this);
 }
 

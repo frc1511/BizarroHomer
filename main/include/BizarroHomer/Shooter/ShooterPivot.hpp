@@ -11,7 +11,7 @@ public:
   ~ShooterPivot();
   
   void process() override;
-  void send_feedback() override;
+  void send_feedback(DashboardServer* dashboard) override;
   
   enum class Preset {
     LOW,
@@ -19,12 +19,26 @@ public:
     HIGH,
   };
   
+  //
+  // Pivot the shooter to a preset position.
+  //
   void set_preset(Preset preset);
   
-  Preset get_preset();
+  //
+  // Pivot the shooter manally using a speed (-1.0 to 1.0).
+  //
+  // A max speed of 1.0 in either direction will equate to 1 rotation/second of
+  // the pivoting motors.
+  //
+  void manual_control(double speed);
+  
+  //
+  // Returns the current position of the shooter, in rotations.
+  //
+  double get_position();
   
 private:
-  Preset m_preset = Preset::LOW;
+  double m_target_position = 0.0;
   
   thunder::TalonFX m_left_motor  { CAN_SHOOTER_PIVOT_LEFT };
   thunder::TalonFX m_right_motor { CAN_SHOOTER_PIVOT_RIGHT };

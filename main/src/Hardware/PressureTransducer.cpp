@@ -1,10 +1,12 @@
 #include <BizarroHomer/Hardware/PressureTransducer.hpp>
-#include <linux/i2c.h>
-#include <linux/i2c-dev.h>
+/* #include <linux/i2c.h> */
+/* #include <linux/i2c-dev.h> */
 #include <fmt/core.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <fcntl.h>
+
+#define I2C_SLAVE 0x0703
 
 #define OS_SINGLE               0x8000 // Single-conversion.
 
@@ -82,7 +84,6 @@ thunder::PressureTransducer::PressureTransducer(int adapter_nr, uint8_t address)
   }
   
   // Config things...
-  set_os(OS_SINGLE);
   set_multiplexer(MUX_DIFF_0_1);
   set_pga(PGA_4096);
   set_mode(MODE_CONTINUOUS);

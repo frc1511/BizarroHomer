@@ -13,11 +13,15 @@
 
 // First frame that button is pressed.
 #define BUTTON_PRESSED(b) \
-  static_cast<bool>(input.buttons & b) && !static_cast<bool>(last_input.buttons & b)
+  (static_cast<bool>(input.buttons & b) && !static_cast<bool>(last_input.buttons & b))
 
 // First frame that button wasn't pressed.
 #define BUTTON_RELEASED(b) \
-  !static_cast<bool>(input.buttons & b) && static_cast<bool>(last_input.buttons & b)
+  (!static_cast<bool>(input.buttons & b) && static_cast<bool>(last_input.buttons & b))
+
+#define TRIGGER_DOWN(t) \
+  (input.axes[t] > 0.75)
+
 
 Controls::Controls(Drive* _drive, Shooter* _shooter, thunder::PDP* _pdp)
 : drive(_drive), shooter(_shooter), pdp(_pdp) { }
@@ -59,6 +63,12 @@ void Controls::handle_leds() {
   }
   else if (shooter->has_pressure()) {
     colors |= DualShock4::ColorBits::PURPLE;
+    
+    // Rumble the controller when pressurized.
+    double pressure_percentage = shooter->get_pressure() / 120.0;
+    pressure_percentage = std::min(pressure_percentage, 1.0);
+    
+    DualShock4::get()->set_rumble(pressure_percentage, pressure_percentage);
   }
   
   // Green if everything is good.
@@ -108,15 +118,15 @@ void Controls::handle_drive() {
 void Controls::handle_shooter() {
   // Pivot presets.
   if (BUTTON_PRESSED(DualShock4_Button::DPAD_UP)) {
-    shooter->set_preset(ShooterPivot::Preset::HIGH);
+    shooter->set_pivot_preset(ShooterPivot::Preset::HIGH);
     fmt::print("Pivot preset HIGH\n");
   }
   if (BUTTON_PRESSED(DualShock4_Button::DPAD_RIGHT)) {
-    shooter->set_preset(ShooterPivot::Preset::MID);
+    shooter->set_pivot_preset(ShooterPivot::Preset::MID);
     fmt::print("Pivot preset MID\n");
   }
   if (BUTTON_PRESSED(DualShock4_Button::DPAD_DOWN)) {
-    shooter->set_preset(ShooterPivot::Preset::LOW);
+    shooter->set_pivot_preset(ShooterPivot::Preset::LOW);
     fmt::print("Pivot preset LOW\n");
   }
   
@@ -131,17 +141,22 @@ void Controls::handle_shooter() {
   }
   
   bool is_pressuzizing = false;
-  
-  // Pressurizing & Shooting.
-  if (BUTTON_DOWN(DualShock4_Button::CROSS)) {
-    if (BUTTON_DOWN(DualShock4_Button::LEFT_BUMPER) && !BUTTON_DOWN(DualShock4_Button::RIGHT_BUMPER)) {
-      shooter->pressurize();
-      is_pressuzizing = true;
-    }
-    if (BUTTON_PRESSED(DualShock4_Button::RIGHT_BUMPER) && !BUTTON_DOWN(DualShock4_Button::LEFT_BUMPER)) {
-      shooter->shoot();
-      fmt::print(stdout, "Shoot\n");
-    }
+
+  // Pressurizing.
+  if (BUTTON_DOWN(DualShock4_Button::LEFT_BUMPER) &&
+      TRIGGER_DOWN(DualShock4_Axis::LEFT_TRIGGER) &&
+      !BUTTON_DOWN(DualShock4_Button::RIGHT_BUMPER)) {
+    
+    shooter->pressurize();
+    is_pressuzizing = true;
+  }
+  // Shooting.
+  else if (BUTTON_DOWN(DualShock4_Button::RIGHT_BUMPER) &&
+           TRIGGER_DOWN(DualShock4_Axis::RIGHT_TRIGGER) &&
+           !BUTTON_DOWN(DualShock4_Button::LEFT_BUMPER)) {
+    
+    shooter->shoot();
+    fmt::print(stdout, "Shoot\n");
   }
   
   if (is_pressuzizing != was_pressurizing) {
