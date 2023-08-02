@@ -9,34 +9,33 @@
 //
 // Simple P control loop.
 //
-#define PROP_GAIN 0.00012
+#define PROP_GAIN 0.15 // 0.2
 
 //
 // Some feed-forward gain since the shooter is pretty heavy.
 //
 #define FEED_FORWARD_GAIN 0.0
 
-ShooterPivot::ShooterPivot() {
-  // Set one inverted since they are mounted on opposite sides of the robot.
-  m_left_motor.set_inverted(false);
-  m_right_motor.set_inverted(true);
-  
-  // Configure closed-loop control for both motors.
-  for (thunder::TalonFX* motor : { &m_left_motor, &m_right_motor }) {
-    motor->config_p(PROP_GAIN);
-    motor->config_i(0.0);
-    motor->config_d(0.0);
-    motor->config_ff(FEED_FORWARD_GAIN);
-    motor->config_izone(0.0);
-  }
-}
+//
+// Maximum percent output of the barrel motor.
+//
+#define MAX_OUTPUT 0.4
 
+ShooterPivot::ShooterPivot() = default;
 ShooterPivot::~ShooterPivot() = default;
 
 void ShooterPivot::process() {
-  // Set the target position for both motors.
-  m_left_motor.set(TalonFXControlMode::Position, m_target_position * ROTATION_TICKS);
-  m_right_motor.set(TalonFXControlMode::Position, m_target_position * ROTATION_TICKS);
+  // The current position in rotations.
+  double current_position = m_left_motor.get_position() / ROTATION_TICKS;
+  
+  double error = m_target_position - current_position;
+  
+  m_output_percent = (PROP_GAIN * error) + FEED_FORWARD_GAIN;
+  m_output_percent = std::clamp(m_output_percent, -MAX_OUTPUT, MAX_OUTPUT);
+  
+  // Control the motors.
+  m_left_motor.set(TalonFXControlMode::PercentOutput, m_output_percent);
+  m_right_motor.set(TalonFXControlMode::PercentOutput, -m_output_percent);
 }
 
 void ShooterPivot::set_preset(Preset preset) {
@@ -60,6 +59,7 @@ double ShooterPivot::get_position() {
 
 void ShooterPivot::send_feedback(DashboardServer* dashboard) {
   dashboard->update_value("Pivot_Position_Left",  m_left_motor.get_position() / 2048.0);
-  dashboard->update_value("Pivot_Position_Right", m_right_motor.get_position() / 2048.0);
+  dashboard->update_value("Pivot_Position_Right", -m_right_motor.get_position() / 2048.0);
   dashboard->update_value("Pivot_TargetPosition", m_target_position);
+  dashboard->update_value("Pivot_PercentOutput", m_output_percent);
 }

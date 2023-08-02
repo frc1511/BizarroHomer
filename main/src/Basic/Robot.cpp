@@ -13,14 +13,16 @@ void Robot::process() {
   for (Mechanism* mech : m_all_mechanisms) {
     mech->process();
   }
-  
-  // Feedback...
-  static int run_num = 0;
-  if (run_num == 0) {
-    for (Mechanism* mech : m_all_mechanisms) {
-      mech->send_feedback(m_dashboard_server);
+
+  if (m_dashboard_server) {
+    // Feedback...
+    static int run_num = 0;
+    if (run_num == 0) {
+      for (Mechanism* mech : m_all_mechanisms) {
+        mech->send_feedback(m_dashboard_server);
+      }
     }
+    run_num++;
+    run_num %= 15; // Every 300ms
   }
-  run_num++;
-  run_num %= 15; // Every 300ms
 }

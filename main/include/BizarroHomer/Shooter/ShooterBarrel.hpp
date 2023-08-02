@@ -33,13 +33,19 @@ private:
   thunder::TalonFX m_motor { CAN_SHOOTER_ROTATION };
   thunder::ThroughBore m_encoder { GPIO_SHOOTER_ROTATION_ENCODER };
   
+  double angle_to_position(double angle) const;
+  double position_to_angle(double position) const;
+  
+  void handle_init();
+  
   // Increments of 60 degrees.
   int m_target_increment = 0;
-  double m_target_position = 0.0;
+  
+  double m_output_percent = 0.0;
   
   bool m_at_position = false;
   
   bool m_init = false;
   std::chrono::system_clock::time_point m_init_time_point;
-  bool m_init_waiting = false;
+  bool m_init_waiting = true;
 };
