@@ -119,13 +119,30 @@ void Controls::handle_shooter() {
     shooter->set_pivot_preset(ShooterPivot::Preset::HIGH);
     fmt::print("Pivot preset HIGH\n");
   }
-  if (BUTTON_PRESSED(DualShock4_Button::DPAD_RIGHT)) {
-    shooter->set_pivot_preset(ShooterPivot::Preset::MID);
-    fmt::print("Pivot preset MID\n");
-  }
   if (BUTTON_PRESSED(DualShock4_Button::DPAD_DOWN)) {
     shooter->set_pivot_preset(ShooterPivot::Preset::LOW);
     fmt::print("Pivot preset LOW\n");
+  }
+  
+  // Pivot manual speed.
+  if (BUTTON_DOWN(DualShock4_Button::DPAD_LEFT)) {
+    shooter->manual_pivot_control(-1.0);
+  }
+  if (BUTTON_PRESSED(DualShock4_Button::DPAD_RIGHT)) {
+    shooter->manual_pivot_control(+1.0);
+  }
+  
+  if (BUTTON_PRESSED(DualShock4_Button::DPAD_LEFT)) {
+    fmt::print("Pivoting DOWN START\n");
+  }
+  if (BUTTON_RELEASED(DualShock4_Button::DPAD_LEFT)) {
+    fmt::print("Pivoting DOWN END\n");
+  }
+  if (BUTTON_PRESSED(DualShock4_Button::DPAD_RIGHT)) {
+    fmt::print("Pivoting UP START\n");
+  }
+  if (BUTTON_RELEASED(DualShock4_Button::DPAD_RIGHT)) {
+    fmt::print("Pivoting UP END\n");
   }
   
   // Barrel rotation.
