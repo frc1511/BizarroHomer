@@ -22,6 +22,8 @@
 #define TRIGGER_DOWN(t) \
   (input.axes[t] > 0.75)
 
+#define TRIGGER_PRESSED(t) \
+  (input.axes[t] > 0.9 && last_input.axes[t] < 0.9)
 
 Controls::Controls(Drive* _drive, Shooter* _shooter, thunder::PDP* _pdp)
 : drive(_drive), shooter(_shooter), pdp(_pdp) { }
@@ -128,7 +130,7 @@ void Controls::handle_shooter() {
   if (BUTTON_DOWN(DualShock4_Button::DPAD_LEFT)) {
     shooter->manual_pivot_control(-1.0);
   }
-  if (BUTTON_PRESSED(DualShock4_Button::DPAD_RIGHT)) {
+  if (BUTTON_DOWN(DualShock4_Button::DPAD_RIGHT)) {
     shooter->manual_pivot_control(+1.0);
   }
   
@@ -167,7 +169,7 @@ void Controls::handle_shooter() {
   }
   // Shooting.
   else if (BUTTON_DOWN(DualShock4_Button::RIGHT_BUMPER) &&
-           TRIGGER_DOWN(DualShock4_Axis::RIGHT_TRIGGER) &&
+           TRIGGER_PRESSED(DualShock4_Axis::RIGHT_TRIGGER) &&
            !BUTTON_DOWN(DualShock4_Button::LEFT_BUMPER)) {
     
     shooter->shoot();

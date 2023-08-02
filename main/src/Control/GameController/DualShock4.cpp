@@ -20,6 +20,10 @@ DualShock4::DualShock4() {
   
   rescan_leds();
   rescan_batteries();
+  
+  m_led_thread = std::thread([this]() {
+    this->led_thread();
+  });
 }
 
 DualShock4::~DualShock4() {
@@ -28,6 +32,9 @@ DualShock4::~DualShock4() {
   }
   
   SDL_Quit();
+  
+  std::lock_guard<std::mutex> lk(m_led_mutex);
+  m_led_should_term = true;
 }
 
 bool DualShock4::is_connected() {
