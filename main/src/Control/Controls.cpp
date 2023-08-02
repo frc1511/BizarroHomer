@@ -168,8 +168,10 @@ void Controls::handle_shooter() {
     is_pressuzizing = true;
   }
   // Shooting.
-  else if (BUTTON_DOWN(DualShock4_Button::RIGHT_BUMPER) &&
-           TRIGGER_PRESSED(DualShock4_Axis::RIGHT_TRIGGER) &&
+  else if ((BUTTON_DOWN(DualShock4_Button::RIGHT_BUMPER) &&
+           TRIGGER_PRESSED(DualShock4_Axis::RIGHT_TRIGGER) ||
+           BUTTON_PRESSED(DualShock4_Button::RIGHT_BUMPER) &&
+           TRIGGER_DOWN(DualShock4_Axis::RIGHT_TRIGGER)) &&
            !BUTTON_DOWN(DualShock4_Button::LEFT_BUMPER)) {
     
     shooter->shoot();
