@@ -28,12 +28,12 @@ public:
   bool is_at_pressure();
   
   //
-  // Whether the fill tank has any pressure.
+  // Returns the current pressure of the fill tank, in PSI.
   //
   double get_pressure();
   
   //
-  // Whether the shoot valve is open.
+  // Whether the robot is currently shooting (fill valve is open).
   //
   bool is_shooting();
   
@@ -44,7 +44,9 @@ private:
   std::chrono::steady_clock::time_point m_fill_close_time_point,
                                         m_shoot_close_time_point;
   
-  thunder::DigitalOutput m_fill_valve, m_shoot_valve;
+  thunder::DigitalOutput m_fill_valve,
+                         m_shoot_valve;
+  
   thunder::PressureTransducer m_pressure_transducer;
   
   double m_pressure = 0.0;

@@ -19,6 +19,9 @@ private:
   Shooter* shooter;
   thunder::PDP* pdp;
   
+  //
+  // Functions to handle the various subsystems.
+  //
   void handle_leds();
   void handle_drive();
   void handle_shooter();

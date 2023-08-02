@@ -8,9 +8,15 @@ namespace thunder {
 
 class DigitalInput : public HardwareComponent {
 public:
+  //
+  // Creates a new digital input on the given channel.
+  //
   DigitalInput(int channel);
   ~DigitalInput();
   
+  //
+  // Reads the current value of the digital input.
+  //
   bool get();
   
 private:

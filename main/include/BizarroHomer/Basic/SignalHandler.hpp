@@ -9,11 +9,9 @@ public:
   SignalHandler(SignalHandler const&) = delete;
   SignalHandler& operator=(SignalHandler const&) = delete;
   
-  /**
-   * @brief Returns whether the program should exit.
-   *
-   * @return Whether the program should exit.
-   */
+  //
+  // Returns whether the program should exit.
+  //
   bool should_exit();
   
   void sig_handler(int sig);

@@ -14,6 +14,9 @@ public:
   ThroughBore(int channel);
   ~ThroughBore();
   
+  //
+  // Returns the current angle of the through bore encoder, in degrees (0-360).
+  //
   double get_angle();
   
 private:

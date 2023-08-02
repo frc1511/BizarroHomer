@@ -12,6 +12,9 @@ public:
   PressureTransducer(int i2c_adapter_nr = 0, uint8_t address = 0x48);
   ~PressureTransducer();
   
+  //
+  // Reads the current pressure of the transducer, in PSI.
+  //
   double read_pressure();
   
 private:

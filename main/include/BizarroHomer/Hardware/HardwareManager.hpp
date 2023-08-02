@@ -21,13 +21,29 @@ public:
   HardwareManager(HardwareManager const&) = delete;
   HardwareManager& operator=(HardwareManager const&) = delete;
   
+  //
+  // Registers a hardware component with the HardwareManager.
+  //
   void register_hardware(HardwareComponent* hardware);
   void register_talon_fx(TalonFX* talon_fx);
   
   void stop_all_hardware();
   
+  //
+  // Begins playing a song using the Falcon 500 motor controllers.
+  //
+  // Tthe Falon 500s will be disabled for the duration of the song.
+  //
   void start_song(Song song);
+  
+  //
+  // Processes the orchestra.
+  //
   void process_orchestra();
+  
+  //
+  // Whether a song is currently playing.
+  //
   bool is_song_playing();
   
   inline static const Song HOME_DEPOT_BEAT {

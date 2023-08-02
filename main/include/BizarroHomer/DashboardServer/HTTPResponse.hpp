@@ -15,6 +15,9 @@ public:
   
   HTTPResponse(Status status, void* content = nullptr, std::size_t content_size = 0);
   
+  //
+  // Returns the HTTP response as a string.
+  //
   std::string string();
   
 private:

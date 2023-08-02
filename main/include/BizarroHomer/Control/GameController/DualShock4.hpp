@@ -52,7 +52,14 @@ public:
   DualShock4(DualShock4 const&) = delete;
   DualShock4& operator=(DualShock4 const&) = delete;
   
+  //
+  // Whether a controller is currently connected.
+  //
   bool is_connected();
+  
+  //
+  // Try to connect with an available controller.
+  //
   bool try_connect();
   
   struct InputFrame {
@@ -60,7 +67,14 @@ public:
     double axes[6] = { 0, 0, 0, 0, 0, 0 };
   };
   
+  //
+  // Gets an input frame from the controller.
+  //
   void get_input(InputFrame* frame);
+  
+  //
+  // Sets the rumble intensity of the controller.
+  //
   void set_rumble(double low_freq, double high_freq, std::chrono::milliseconds duration = 100ms);
   
   enum ColorBits {
@@ -73,8 +87,14 @@ public:
     OFF    = 1 << 6,
   };
   
+  //
+  // Sets the color of the controller's LEDs.
+  //
   void set_colors(uint8_t colors);
   
+  //
+  // Gets the battery percentage of the controller (0-1).
+  //
   double get_battery_percentage();
   
 private:
