@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.1)
 
 project(BizarroHomerAll)
 
+add_compile_options(-Wno-psabi)
+
 # Initialize directories, files, etc.
 install(CODE "execute_process(COMMAND sudo ./scripts/init_workspace.sh)")
 
