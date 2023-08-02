@@ -1,12 +1,10 @@
 #include <BizarroHomer/Hardware/PressureTransducer.hpp>
-/* #include <linux/i2c.h> */
-/* #include <linux/i2c-dev.h> */
+#include <linux/i2c.h>
+#include <linux/i2c-dev.h>
 #include <fmt/core.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <fcntl.h>
-
-#define I2C_SLAVE 0x0703
 
 #define OS_SINGLE               0x8000 // Single-conversion.
 
