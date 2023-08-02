@@ -1,6 +1,5 @@
 #include <BizarroHomer/DashboardServer/ConnectionManager.hpp>
 #include <BizarroHomer/DashboardServer/HTTPRequest.hpp>
-#include <BizarroHomer/DashboardServer/DataManager.hpp>
 #include <unistd.h>
 #include <sys/fcntl.h>
 #include <fmt/core.h>
