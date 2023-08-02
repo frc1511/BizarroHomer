@@ -44,12 +44,14 @@ void DashboardServer::process() {
     // Bind the address to the socket.
     if (bind(m_server_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
       fmt::print(stderr, "bind() failed:\n\t{}\n", strerror(errno));
+      close(m_server_fd);
       return;
     }
     
     // Listen for connections on socket.
     if (listen(m_server_fd, 10) < 0) {
       fmt::print(stderr, "listen() failed:\n\t{}\n", strerror(errno));
+      close(m_server_fd);
       return;
     }
     
