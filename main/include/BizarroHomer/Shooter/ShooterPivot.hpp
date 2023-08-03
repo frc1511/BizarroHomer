@@ -40,8 +40,8 @@ public:
 private:
   double m_target_position = 0.0;
   
-  thunder::TalonFX m_left_motor  { CAN_SHOOTER_PIVOT_LEFT };
-  thunder::TalonFX m_right_motor { CAN_SHOOTER_PIVOT_RIGHT };
+  thunder::TalonFX m_left_motor  { CAN_PIVOT_LEFT };
+  thunder::TalonFX m_right_motor { CAN_PIVOT_RIGHT };
   
   double m_output_percent = 0.0;
   

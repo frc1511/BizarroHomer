@@ -14,13 +14,14 @@ install(CODE "execute_process(COMMAND sudo ./scripts/init_workspace.sh)")
 set(BH_THIRDPARTY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty")
 
 # fmt
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fmt")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fmt" EXCLUDE_FROM_ALL)
 
 # Phoenix
 add_subdirectory("${BH_THIRDPARTY_DIR}/Phoenix")
 
 # rpi_ws281x
-add_subdirectory("${BH_THIRDPARTY_DIR}/rpi_ws281x")
+add_subdirectory("${BH_THIRDPARTY_DIR}/rpi_ws281x" EXCLUDE_FROM_ALL)
+include_directories("BizarroHomerMain" PUBLIC "${BH_THIRDPARTY_DIR}/rpi_ws281x")
 
 #
 # Build stuff.

@@ -30,8 +30,8 @@ public:
   bool is_rotating();
   
 private:
-  thunder::TalonFX m_motor { CAN_SHOOTER_ROTATION };
-  thunder::ThroughBore m_encoder { GPIO_SHOOTER_ROTATION_ENCODER };
+  thunder::TalonFX m_motor { CAN_BARREL_ROTATION };
+  thunder::ThroughBore m_encoder { GPIO_BARREL_ENCODER };
   
   double angle_to_position(double angle) const;
   double position_to_angle(double position) const;

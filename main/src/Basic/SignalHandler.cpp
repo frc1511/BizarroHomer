@@ -2,6 +2,8 @@
 #include <BizarroHomer/Hardware/HardwareManager.hpp>
 #include <BizarroHomer/Control/GameController/DualShock4.hpp>
 #include <signal.h>
+#include <thread>
+#include <chrono>
 #include <fmt/core.h>
 
 SignalHandler::SignalHandler() {
@@ -34,7 +36,10 @@ void SignalHandler::sig_handler(int sig) {
   thunder::HardwareManager::get()->stop_all_hardware();
   
   // Set controller LED colors to signify program ended.
-  DualShock4::get()->set_colors(DualShock4::ColorBits::BLUE | DualShock4::ColorBits::OFF);
+  DualShock4::get()->set_colors(DualShock4::ColorBits::BLUE);
+  
+  using namespace std::literals::chrono_literals;
+  std::this_thread::sleep_for(500ms);
   
   exit(0);
 }
