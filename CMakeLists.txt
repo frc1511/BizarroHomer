@@ -19,13 +19,15 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fmt")
 # Phoenix
 add_subdirectory("${BH_THIRDPARTY_DIR}/Phoenix")
 
+# rpi_ws281x
+add_subdirectory("${BH_THIRDPARTY_DIR}/rpi_ws281x")
+
 #
 # Build stuff.
 #
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/shared")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/main")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dashboard_server")
 
 #
 # Install files.

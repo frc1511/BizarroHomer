@@ -39,6 +39,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt)
 # Phoenix
 target_link_libraries(${PROJECT_NAME} PRIVATE Phoenix)
 
+# rpi_ws281x
+target_link_libraries(${PROJECT_NAME} PRIVATE rpi_ws281x)
+
 # Install program.
 install(TARGETS ${PROJECT_NAME} DESTINATION "/usr/local/bin")
 
