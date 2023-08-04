@@ -7,6 +7,7 @@
 
 thunder::DigitalInput::DigitalInput(int channel)
 : m_channel(channel),
+  m_channel_str(std::to_string(channel)),
   m_channel_path(fmt::format("/sys/class/gpio/gpio{}", channel)),
   m_channel_dir_path(m_channel_path / "direction"),
   m_channel_value_path(m_channel_path / "value") {
