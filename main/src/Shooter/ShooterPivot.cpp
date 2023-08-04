@@ -9,17 +9,18 @@
 //
 // Simple P control loop.
 //
-#define PROP_GAIN 0.15 // 0.2
+#define PROP_GAIN 0.3 // 0.2
 
 //
 // Some feed-forward gain since the shooter is pretty heavy.
 //
-#define FEED_FORWARD_GAIN 0.0
+#define FEED_FORWARD_GAIN 0.05
 
 //
 // Maximum percent output of the barrel motor.
 //
-#define MAX_OUTPUT 0.4
+#define MAX_OUTPUT 0.13
+#define MIN_OUTPUT -0.01
 
 ShooterPivot::ShooterPivot() = default;
 ShooterPivot::~ShooterPivot() = default;
@@ -30,8 +31,8 @@ void ShooterPivot::process() {
   
   double error = m_target_position - current_position;
   
-  m_output_percent = (PROP_GAIN * error) + FEED_FORWARD_GAIN;
-  m_output_percent = std::clamp(m_output_percent, -MAX_OUTPUT, MAX_OUTPUT);
+  m_output_percent = (PROP_GAIN * error);
+  m_output_percent = std::clamp(m_output_percent, MIN_OUTPUT, MAX_OUTPUT);
   
   // Control the motors.
   m_left_motor.set(TalonFXControlMode::PercentOutput, m_output_percent);
@@ -44,7 +45,7 @@ void ShooterPivot::set_preset(Preset preset) {
 
 void ShooterPivot::manual_control(double speed) {
   // About 1 rotation per second since the main loop runs at 50Hz.
-  m_target_position += 0.02 * speed;
+  m_target_position += 0.03 * speed;
   
   double low_preset = m_preset_positions.at(Preset::LOW);
   double high_preset = m_preset_positions.at(Preset::HIGH);

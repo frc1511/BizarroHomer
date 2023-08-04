@@ -51,13 +51,13 @@ void Controls::handle_leds() {
   m_colors = 0;
   
   // KITT by default.
-  BlinkyBlinky::LEDMode led_mode = BlinkyBlinky::LEDMode::KITT;
+  /* BlinkyBlinky::LEDMode led_mode = BlinkyBlinky::LEDMode::KITT; */
   
   // Robot battery low.
   if (m_pdp->get_voltage() < 12.0) {
     m_colors |= DualShock4::ColorBits::RED;
     // Turn off the LEDs when the battery is low.
-    led_mode = BlinkyBlinky::LEDMode::OFF;
+    /* led_mode = BlinkyBlinky::LEDMode::OFF; */
   }
   
   // Controller battery low.
@@ -79,8 +79,8 @@ void Controls::handle_leds() {
     
     DualShock4::get()->set_rumble(pressure_percentage, pressure_percentage);
     
-    m_blinky_blinky->set_pressure(pressure_percentage);
-    led_mode = BlinkyBlinky::LEDMode::PRESSURE;
+    /* m_blinky_blinky->set_pressure(pressure_percentage); */
+    /* led_mode = BlinkyBlinky::LEDMode::PRESSURE; */
   }
   
   // Green if everything is good.
@@ -93,7 +93,7 @@ void Controls::handle_leds() {
     m_last_colors = m_colors;
   }
    
-  m_blinky_blinky->set_mode(led_mode);
+  /* m_blinky_blinky->set_mode(led_mode); */
 }
 
 void Controls::handle_drive() {

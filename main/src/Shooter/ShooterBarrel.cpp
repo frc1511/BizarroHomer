@@ -23,6 +23,7 @@ ShooterBarrel::ShooterBarrel() {
 ShooterBarrel::~ShooterBarrel() = default;
 
 void ShooterBarrel::process() {
+  /*
   if (!m_init) {
     handle_init();
     return;
@@ -39,6 +40,8 @@ void ShooterBarrel::process() {
   m_output_percent = std::clamp(m_output_percent, -MAX_OUTPUT, MAX_OUTPUT);
   
   m_motor.set(TalonFXControlMode::PercentOutput, m_output_percent);
+  */
+  m_motor.set(TalonFXControlMode::PercentOutput, 0.0);
 }
 
 void ShooterBarrel::handle_init() {

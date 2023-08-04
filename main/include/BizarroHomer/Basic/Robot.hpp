@@ -22,21 +22,21 @@ private:
   
   thunder::PDP m_pdp { 0 };
   
-  BlinkyBlinky m_blinky_blinky;
+  /* BlinkyBlinky m_blinky_blinky; */
   
   Drive m_drive;
   Shooter m_shooter;
-  Controls m_controls { &m_drive, &m_shooter, &m_pdp, &m_blinky_blinky };
+  Controls m_controls { &m_drive, &m_shooter, &m_pdp, nullptr };// &m_blinky_blinky };
   
   std::vector<Mechanism*> m_all_mechanisms {
-    &m_blinky_blinky, &m_drive, &m_controls, &m_shooter
+    /*&m_blinky_blinky,*/ &m_drive, &m_controls, &m_shooter
   };
   
   std::vector<Mechanism*> m_control_mechanisms {
     &m_drive, &m_controls, &m_shooter
   };
   std::vector<Mechanism*> m_other_mechanisms {
-    &m_blinky_blinky
+    /* &m_blinky_blinky */
   };
   std::size_t m_other_mech_iter = 0;
   
