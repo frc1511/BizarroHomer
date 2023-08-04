@@ -18,7 +18,7 @@ public:
   enum class LEDMode {
     OFF,
     RAINBOW,
-    KNIGHT_RIDER,
+    KITT,
     HOME_DEPOT,
     PRESSURE,
   };
@@ -41,4 +41,12 @@ private:
   double m_pressure_percent = 0.0;
   
   void set_color(Color color);
+  
+  void rainbow();
+  void kitt();
+  void pressure();
+  
+  uint8_t m_first_pixel_hue = 0;
+  int m_kitt_iter = 0;
+  int m_kitt_dir = 1;
 };
