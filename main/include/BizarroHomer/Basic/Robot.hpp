@@ -21,12 +21,12 @@ private:
   DashboardServer* m_dashboard_server;
   
   thunder::PDP m_pdp { 0 };
-
+  
   BlinkyBlinky m_blinky_blinky;
   
   Drive m_drive;
   Shooter m_shooter;
-  Controls m_controls { &m_drive, &m_shooter, &m_pdp };
+  Controls m_controls { &m_drive, &m_shooter, &m_pdp, &m_blinky_blinky };
   
   std::vector<Mechanism*> m_all_mechanisms {
     &m_blinky_blinky, &m_drive, &m_controls, &m_shooter

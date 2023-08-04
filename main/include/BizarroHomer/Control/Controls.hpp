@@ -6,18 +6,20 @@
 
 class Drive;
 class Shooter;
+class BlinkyBlinky;
 
 class Controls : public Mechanism {
 public:
-  Controls(Drive* drive, Shooter* shooter, thunder::PDP* pdp);
+  Controls(Drive* drive, Shooter* shooter, thunder::PDP* pdp, BlinkyBlinky* blinky_blinky);
   ~Controls();
   
   void process() override;
   
 private:
-  Drive* drive;
-  Shooter* shooter;
-  thunder::PDP* pdp;
+  Drive* m_drive;
+  Shooter* m_shooter;
+  thunder::PDP* m_pdp;
+  BlinkyBlinky* m_blinky_blinky;
   
   //
   // Functions to handle the various subsystems.
@@ -30,11 +32,13 @@ private:
     TANK = 0,
     ARCADE = 1,
   };
-  DriveMode drive_mode = DriveMode::ARCADE;
+  DriveMode m_drive_mode = DriveMode::ARCADE;
 
-  bool was_pressurizing = false;
+  bool m_was_pressurizing = false;
   
-  DualShock4::InputFrame input, last_input;
+  DualShock4::InputFrame m_input,
+                         m_last_input;
   
-  uint8_t colors = 0, last_colors = 0;
+  uint8_t m_colors = 0,
+          m_last_colors = 0;
 };

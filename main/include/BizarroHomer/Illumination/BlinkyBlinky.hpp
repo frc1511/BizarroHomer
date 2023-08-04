@@ -29,7 +29,7 @@ public:
   void set_mode(LEDMode mode);
   
   //
-  // Sets the LED mode to PRESSURE and sets the pressure scale percent (0-1).
+  // Sets the pressure scale percent (0-1).
   //
   void set_pressure(double percent);
   

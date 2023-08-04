@@ -1,6 +1,6 @@
 #include <BizarroHomer/Illumination/BlinkyBlinky.hpp>
 
-#define LOOP_TIME 20.0 // ms
+#define LOOP_TIME 60.0 // ms
 #define KITT_TIME 800.0 // ms
 
 #define KITT_LOOPS (KITT_TIME / LOOP_TIME)
@@ -35,7 +35,6 @@ void BlinkyBlinky::set_mode(LEDMode mode) {
 }
 
 void BlinkyBlinky::set_pressure(double percent) {
-  m_mode = LEDMode::PRESSURE;
   m_pressure_percent = percent;
 }
 
