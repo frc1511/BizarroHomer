@@ -10,19 +10,35 @@ Robot::~Robot() { }
 void Robot::process() {
   thunder::HardwareManager::get()->process_orchestra();
   
-  for (Mechanism* mech : m_all_mechanisms) {
+  //
+  // Control Mechanisms
+  //
+  for (Mechanism* mech : m_control_mechanisms) {
     mech->process();
   }
-
+  
+  //
+  // Other Mechanisms (every 60ms).
+  //
+  if (m_other_mech_iter == 0) {
+    for (Mechanism* mech : m_other_mechanisms) {
+      mech->process();
+    }
+  }
+  m_other_mech_iter++;
+  m_other_mech_iter %= 3; // Every 60ms
+  
+  //
+  // Dashboard Feedback (every 300ms).
+  //
   if (m_dashboard_server) {
     // Feedback...
-    static int run_num = 0;
-    if (run_num == 0) {
+    if (m_feedback_iter == 0) {
       for (Mechanism* mech : m_all_mechanisms) {
         mech->send_feedback(m_dashboard_server);
       }
     }
-    run_num++;
-    run_num %= 15; // Every 300ms
+    m_feedback_iter++;
+    m_feedback_iter %= 15; // Every 300ms
   }
 }
