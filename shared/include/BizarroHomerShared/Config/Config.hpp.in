@@ -1,3 +1,0 @@
-#pragma once
-
-#define IPC_PATHNAME "@IPC_PATHNAME@"
