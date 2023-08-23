@@ -105,7 +105,7 @@ void Controls::handle_drive() {
   };
   
   if (BUTTON_PRESSED(DualShock4_Button::PLAYSTATION)) {
-    thunder::HardwareManager::get()->start_song(thunder::HardwareManager::HOME_DEPOT_BEAT);
+    thunder::HardwareManager::get()->start_song(thunder::HardwareManager::THUNDERSTRUCK);
   }
   
   // Toggle drive mode.

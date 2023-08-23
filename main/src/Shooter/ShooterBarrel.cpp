@@ -7,14 +7,16 @@ using namespace std::literals::chrono_literals;
 //
 // Simple P control loop.
 //
-#define PROP_GAIN 0.005
+#define PROP_GAIN 0.02
 
 #define ANGLE_TOLERANCE 5.0
 
 //
 // Maximum percent output of the barrel motor.
 //
-#define MAX_OUTPUT 0.4
+#define MAX_OUTPUT 1.0
+
+#define INIT_WAIT_TIME 1000ms
 
 ShooterBarrel::ShooterBarrel() {
   m_init_time_point = std::chrono::system_clock::now();
@@ -28,6 +30,7 @@ void ShooterBarrel::process() {
     handle_init();
     return;
   }
+  */
   
   double current_angle = position_to_angle(m_motor.get_position());
   double target_angle = std::fmod(m_target_increment * 60.0, 360.0);
@@ -40,8 +43,6 @@ void ShooterBarrel::process() {
   m_output_percent = std::clamp(m_output_percent, -MAX_OUTPUT, MAX_OUTPUT);
   
   m_motor.set(TalonFXControlMode::PercentOutput, m_output_percent);
-  */
-  m_motor.set(TalonFXControlMode::PercentOutput, 0.0);
 }
 
 void ShooterBarrel::handle_init() {
@@ -49,7 +50,7 @@ void ShooterBarrel::handle_init() {
     m_motor.set(TalonFXControlMode::PercentOutput, 0.0);
     
     auto dur = std::chrono::system_clock::now() - m_init_time_point;
-    if (dur > 500ms) {
+    if (dur > 1000ms) {
       double angle = m_encoder.get_angle();
       m_motor.set_position(angle_to_position(angle));
       

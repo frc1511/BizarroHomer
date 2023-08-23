@@ -15,6 +15,7 @@ using namespace std::literals::chrono_literals;
 
 thunder::ThroughBore::ThroughBore(int channel)
 : m_channel_input(channel) {
+  fmt::print("Initializing Through Bore at channel {}\n", channel);
   // Start the read thread.
   m_read_thread = std::thread([this]() {
     this->read_thread();
@@ -36,7 +37,7 @@ double thunder::ThroughBore::get_angle() {
 }
 
 void thunder::ThroughBore::read_thread() {
-  LinearFilter<double> filter = LinearFilter<double>::moving_average(20);
+  LinearFilter<double> filter = LinearFilter<double>::single_pole_iir(0.5, 0.00102);
   
   while (true) {
     {

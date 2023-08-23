@@ -44,7 +44,7 @@ void ShooterPivot::set_preset(Preset preset) {
 }
 
 void ShooterPivot::manual_control(double speed) {
-  // About 1 rotation per second since the main loop runs at 50Hz.
+  // About 1.5 rotation per second since the main loop runs at 50Hz.
   m_target_position += 0.03 * speed;
   
   double low_preset = m_preset_positions.at(Preset::LOW);
